@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offroad Sem Juízo – Club 4x4</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;600&display=swap"
+    rel="stylesheet"
+  >
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  >
+  <style>
+    /* ── Reset & Variables ─────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black:  #0a0a0a;
+      --dark:   #111111;
+      --gold:   #C9A227;
+      --yellow: #C9A227;
+      --green:  #4A5C28;
+      --white:  #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ───────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 40px;
+      background: rgba(10, 10, 10, 0.96);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(201, 162, 39, 0.15);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
+
+    .nav-logo-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #fff;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-logo-wrap svg { width: 48px; height: 48px; }
+
+    .nav-brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .nav-links li a:hover { color: var(--gold); }
+
+    .nav-insta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--black) !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-weight: 700 !important;
+      transition: background .2s;
+    }
+
+    .nav-insta:hover { background: #b8912a !important; }
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    #home {
+      min-height: 100vh;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+
+    .hero-accent-line {
+      position: absolute;
+      top: 72px;
+      left: 0; right: 0;
+      height: 2px;
+      background: #4caf50;
+      opacity: .65;
+    }
+
+    .hero-logo-box {
+      width: 180px;
+      height: 180px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 44px;
+      border-radius: 2px;
+    }
+
+    .hero-logo-box svg { width: 160px; height: 160px; }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 9vw, 88px);
+      color: var(--gold);
+      letter-spacing: 6px;
+      line-height: 1;
+      margin-bottom: 22px;
+    }
+
+    .hero-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: var(--white);
+      margin-bottom: 44px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--gold);
+      color: var(--black);
+      text-decoration: none;
+      padding: 18px 56px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 5px;
+      border: 2px solid var(--gold);
+      transition: background .3s, color .3s;
+    }
+
+    .hero-cta:hover { background: transparent; color: var(--gold); }
+
+    .hero-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .hero-footer p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .7;
+      line-height: 2;
+    }
+
+    /* ── ABOUT ─────────────────────────────────────────────── */
+    #sobre {
+      background: var(--gold);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 60px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .about-left h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 7vw, 84px);
+      color: var(--black);
+      line-height: .9;
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+    }
+
+    .about-left p {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--black);
+      margin-bottom: 14px;
+    }
+
+    .about-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feature-box {
+      background: var(--black);
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+      min-height: 130px;
+    }
+
+    .feature-box i {
+      font-size: 30px;
+      color: var(--white);
+    }
+
+    .feature-box span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.4;
+    }
+
+    /* diagonal cut between about and adventures */
+    .about-diagonal {
+      height: 80px;
+      background: var(--gold);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 30%);
+      margin-bottom: -2px;
+    }
+
+    /* ── ADVENTURES (Nossas Aventuras) ─────────────────────── */
+    #aventuras {
+      background: var(--black);
+      padding: 80px 0 60px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(38px, 5.5vw, 64px);
+      text-align: center;
+      letter-spacing: 6px;
+      color: var(--gold);
+      margin-bottom: 50px;
+    }
+
+    /* ── GALLERY ───────────────────────────────────────────── */
+    #galeria {
+      background: var(--black);
+      padding: 80px 0 60px;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .photo-cell {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+    }
+
+    .photo-cell img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .4s ease;
+    }
+
+    .photo-cell:hover img { transform: scale(1.06); }
+
+    /* Placeholder gradient tiles (replace src with real photos) */
+    .photo-cell.ph-1 { background: linear-gradient(135deg,#2a4a1a,#3d6b2e,#5a8b4a); }
+    .photo-cell.ph-2 { background: linear-gradient(160deg,#6b8b4a,#8aaf6a,#4a6b30); }
+    .photo-cell.ph-3 { background: linear-gradient(135deg,#a08060,#c5a07a,#8b6040); }
+    .photo-cell.ph-4 { background: linear-gradient(135deg,#d4b896,#c9a87a,#e8d4b0); }
+    .photo-cell.ph-5 { background: linear-gradient(180deg,#1a3a1a,#2d5a2d,#4a7a4a); }
+    .photo-cell.ph-6 { background: linear-gradient(135deg,#c05a30,#d4784a,#e89070); }
+    .photo-cell.ph-7 { background: linear-gradient(135deg,#7a5030,#a07050,#c09070); }
+
+    .photo-cell.empty { background: var(--black); }
+
+    /* photo label overlay on hover */
+    .photo-cell::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      transition: background .3s;
+    }
+
+    .photo-cell:hover::after { background: rgba(0,0,0,.25); }
+
+    /* ── EVENTS ────────────────────────────────────────────── */
+    #eventos {
+      background: var(--green);
+      padding: 80px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative diagonal lines */
+    #eventos::before, #eventos::after {
+      content: '';
+      position: absolute;
+      height: 3px;
+      background: rgba(255,255,255,.12);
+      transform: rotate(-12deg);
+    }
+
+    #eventos::before { width: 260px; top: 40px; left: -40px; }
+    #eventos::after  { width: 200px; bottom: 60px; right: -20px; }
+
+    .eventos-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 6.5vw, 72px);
+      text-align: center;
+      letter-spacing: 6px;
+      color: var(--gold);
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .eventos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .event-card {
+      background: var(--dark);
+      border: 1px solid var(--gold);
+      padding: 32px 26px 30px;
+      position: relative;
+    }
+
+    .event-badge {
+      position: absolute;
+      top: -1px; right: -1px;
+      padding: 5px 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .badge-media { background: #D4682A; }
+    .badge-alta  { background: #C0392B; }
+    .badge-baixa { background: #27AE60; }
+
+    .event-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-top: 18px;
+      margin-bottom: 22px;
+    }
+
+    .event-meta { display: flex; flex-direction: column; gap: 12px; }
+
+    .event-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      color: var(--white);
+      letter-spacing: 1px;
+    }
+
+    .event-meta-row i { color: var(--gold); width: 16px; font-size: 14px; }
+
+    /* ── CTA / FOOTER ──────────────────────────────────────── */
+    #cta {
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 80px 24px 0;
+    }
+
+    .cta-logo-box {
+      width: 140px; height: 140px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .cta-logo-box svg { width: 130px; height: 130px; }
+
+    /* Re-use hero line in CTA */
+    .cta-green-line {
+      width: 100%;
+      height: 2px;
+      background: #4caf50;
+      opacity: .6;
+      margin: 18px 0;
+    }
+
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 7vw, 72px);
+      color: var(--gold);
+      letter-spacing: 6px;
+      margin-bottom: 20px;
+    }
+
+    .cta-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 1px;
+      margin-bottom: 40px;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--gold);
+      color: var(--black);
+      text-decoration: none;
+      padding: 18px 56px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 5px;
+      border: 2px solid var(--gold);
+      transition: background .3s, color .3s;
+      margin-bottom: 56px;
+    }
+
+    .cta-btn:hover { background: transparent; color: var(--gold); }
+
+    .site-footer {
+      width: 100%;
+      border-top: 1px solid rgba(255,255,255,.12);
+      padding: 22px 24px;
+      text-align: center;
+    }
+
+    .site-footer p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .7;
+      line-height: 2.2;
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 10px 20px; }
+      .nav-links { gap: 20px; }
+
+      .about-inner { grid-template-columns: 1fr; padding: 60px 24px 0; gap: 36px; }
+
+      .eventos-grid { grid-template-columns: 1fr; padding: 0 24px; gap: 20px; }
+
+      .photo-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 580px) {
+      .nav-brand-name { display: none; }
+      .nav-links { gap: 16px; }
+      .nav-links li:not(:last-child) { display: none; }
+
+      .photo-grid { grid-template-columns: 1fr 1fr; }
+
+      .hero-logo-box { width: 140px; height: 140px; }
+      .hero-logo-box svg { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ NAV -->
+<nav>
+  <a href="#home" class="nav-brand">
+    <div class="nav-logo-wrap">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="49" fill="#111"/>
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#C9A227" stroke-width="1.2" stroke-dasharray="3 2"/>
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#C9A227" stroke-width="1.8"/>
+        <text x="50" y="17" text-anchor="middle" fill="#C9A227" font-family="Arial Black" font-size="6.5" letter-spacing="2">CLUB 4X4 SEM JUIZO</text>
+        <!-- simplified jeep -->
+        <rect x="24" y="44" width="52" height="20" rx="2" fill="#C9A227"/>
+        <rect x="30" y="36" width="36" height="14" rx="2" fill="#C9A227"/>
+        <rect x="32" y="38" width="14" height="10" rx="1" fill="#111" opacity=".7"/>
+        <rect x="50" y="38" width="12" height="10" rx="1" fill="#111" opacity=".7"/>
+        <circle cx="34" cy="64" r="7" fill="#111" stroke="#C9A227" stroke-width="2"/>
+        <circle cx="66" cy="64" r="7" fill="#111" stroke="#C9A227" stroke-width="2"/>
+        <text x="50" y="84" text-anchor="middle" fill="#fff" font-family="Arial Black" font-size="7.5" letter-spacing="1">CLUB OFF ROAD</text>
+        <text x="50" y="93" text-anchor="middle" fill="#C9A227" font-family="Arial" font-size="5" letter-spacing="1">NÃO TEM REGRA</text>
+      </svg>
+    </div>
+    <span class="nav-brand-name">Offroad Sem Juízo</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#galeria">Galeria</a></li>
+    <li><a href="#eventos">Eventos</a></li>
+    <li>
+      <a href="https://instagram.com/offroadsemjuizo" target="_blank" rel="noopener" class="nav-insta">
+        <i class="fab fa-instagram"></i> Insta
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════ HERO -->
+<section id="home">
+  <div class="hero-accent-line"></div>
+
+  <div class="hero-logo-box">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="96" fill="#111"/>
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A227" stroke-width="2.5"/>
+      <circle cx="100" cy="100" r="82" fill="none" stroke="#C9A227" stroke-width="1" stroke-dasharray="4 2.5"/>
+      <!-- arc text top -->
+      <path id="topArc" d="M 24,100 A 76,76 0 0,1 176,100" fill="none"/>
+      <text font-family="Arial Black" font-size="12" fill="#C9A227" letter-spacing="3">
+        <textPath href="#topArc" startOffset="6%">CLUB 4X4 SEM JUIZO</textPath>
+      </text>
+      <!-- jeep body -->
+      <rect x="46" y="88" width="108" height="38" rx="4" fill="#C9A227"/>
+      <rect x="58" y="68" width="76" height="28" rx="3" fill="#C9A227"/>
+      <!-- windows -->
+      <rect x="63" y="72" width="30" height="20" rx="2" fill="#222" opacity=".75"/>
+      <rect x="99" y="72" width="28" height="20" rx="2" fill="#222" opacity=".75"/>
+      <!-- wheels -->
+      <circle cx="70" cy="126" r="16" fill="#111" stroke="#C9A227" stroke-width="3.5"/>
+      <circle cx="70" cy="126" r="6" fill="#444"/>
+      <circle cx="130" cy="126" r="16" fill="#111" stroke="#C9A227" stroke-width="3.5"/>
+      <circle cx="130" cy="126" r="6" fill="#444"/>
+      <!-- bumper -->
+      <rect x="36" y="96" width="14" height="24" rx="2" fill="#888"/>
+      <!-- arc text bottom -->
+      <path id="botArc" d="M 22,108 A 78,78 0 0,0 178,108" fill="none"/>
+      <text font-family="Arial Black" font-size="14" fill="#fff" letter-spacing="2">
+        <textPath href="#botArc" startOffset="12%">CLUB OFF ROAD</textPath>
+      </text>
+      <text x="100" y="188" text-anchor="middle" fill="#C9A227" font-family="Arial" font-size="9" letter-spacing="2">NÃO TEM REGRA</text>
+    </svg>
+  </div>
+
+  <h1 class="hero-title">Bora Pra Trilha?</h1>
+  <p class="hero-sub">Segue a gente no Instagram e fica por dentro de todos os rolés</p>
+
+  <a href="https://instagram.com/offroadsemjuizo" target="_blank" rel="noopener" class="hero-cta">
+    <i class="fab fa-instagram"></i>
+    @OffRoadSemJuizo
+  </a>
+
+  <div class="hero-footer">
+    <p>Clube Offroad Sem Juízo © 2026</p>
+    <p>Única Regra: Não Tem Regra</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ SOBRE -->
+<section id="sobre">
+  <div class="about-inner">
+    <div class="about-left">
+      <h2>Quem<br>Somos</h2>
+      <p>
+        Somos um bando de aventureiros que vive para sentir a adrenalina das
+        trilhas, a lama nos pneus e a liberdade do off-road.
+      </p>
+      <p>
+        Não importa o veículo, não importa a experiência. Se você tem sangue de
+        aventureiro, é tudo nosso.
+      </p>
+    </div>
+
+    <div class="about-features">
+      <div class="feature-box">
+        <i class="fas fa-truck-monster"></i>
+        <span>Todo Tipo<br>de 4x4</span>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-users"></i>
+        <span>Galera<br>Sem Frescura</span>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Trilhas<br>Extremas</span>
+      </div>
+      <div class="feature-box">
+        <i class="fas fa-bolt"></i>
+        <span>Pura<br>Adrenalina</span>
+      </div>
+    </div>
+  </div>
+  <!-- diagonal cut -->
+  <div class="about-diagonal"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════ AVENTURAS -->
+<section id="aventuras">
+  <h2 class="section-title">Nossas Aventuras</h2>
+
+  <!--
+    Replace the placeholder divs below with <img> tags pointing to your photos.
+    Example: <img src="fotos/trilha1.jpg" alt="Trilha da cachoeira">
+  -->
+  <div class="photo-grid">
+    <div class="photo-cell ph-1"></div>
+    <div class="photo-cell ph-2"></div>
+    <div class="photo-cell ph-3"></div>
+    <div class="photo-cell ph-4"></div>
+    <div class="photo-cell ph-5"></div>
+    <div class="photo-cell ph-6"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ GALERIA -->
+<section id="galeria">
+  <h2 class="section-title">Galeria</h2>
+
+  <!--
+    Replace placeholder divs with <img> tags or background-image styles
+    pointing to your off-road photos.
+  -->
+  <div class="photo-grid">
+    <div class="photo-cell ph-2"></div>
+    <div class="photo-cell ph-3"></div>
+    <div class="photo-cell ph-7"></div>
+    <div class="photo-cell empty"></div>
+    <div class="photo-cell ph-4"></div>
+    <div class="photo-cell ph-5"></div>
+    <div class="photo-cell ph-6"></div>
+    <div class="photo-cell empty"></div>
+    <div class="photo-cell empty"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ EVENTOS -->
+<section id="eventos">
+  <h2 class="eventos-title">Próximos Rolês</h2>
+
+  <div class="eventos-grid">
+
+    <div class="event-card">
+      <span class="event-badge badge-media">Média</span>
+      <h3 class="event-name">Trilha da Cachoeira</h3>
+      <div class="event-meta">
+        <div class="event-meta-row">
+          <i class="far fa-calendar-alt"></i>
+          <span>20 Abr 2026</span>
+        </div>
+        <div class="event-meta-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Serra do Mar</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <span class="event-badge badge-alta">Alta</span>
+      <h3 class="event-name">Rali Noturno</h3>
+      <div class="event-meta">
+        <div class="event-meta-row">
+          <i class="far fa-calendar-alt"></i>
+          <span>04 Mai 2026</span>
+        </div>
+        <div class="event-meta-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Interior SP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-card">
+      <span class="event-badge badge-baixa">Baixa</span>
+      <h3 class="event-name">Acampamento Off-Road</h3>
+      <div class="event-meta">
+        <div class="event-meta-row">
+          <i class="far fa-calendar-alt"></i>
+          <span>15 Mai 2026</span>
+        </div>
+        <div class="event-meta-row">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Minas Gerais</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CTA -->
+<section id="cta">
+  <div class="cta-logo-box">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="96" fill="#111"/>
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#C9A227" stroke-width="2.5"/>
+      <circle cx="100" cy="100" r="82" fill="none" stroke="#C9A227" stroke-width="1" stroke-dasharray="4 2.5"/>
+      <path id="topArc2" d="M 24,100 A 76,76 0 0,1 176,100" fill="none"/>
+      <text font-family="Arial Black" font-size="12" fill="#C9A227" letter-spacing="3">
+        <textPath href="#topArc2" startOffset="6%">CLUB 4X4 SEM JUIZO</textPath>
+      </text>
+      <rect x="46" y="88" width="108" height="38" rx="4" fill="#C9A227"/>
+      <rect x="58" y="68" width="76" height="28" rx="3" fill="#C9A227"/>
+      <rect x="63" y="72" width="30" height="20" rx="2" fill="#222" opacity=".75"/>
+      <rect x="99" y="72" width="28" height="20" rx="2" fill="#222" opacity=".75"/>
+      <circle cx="70" cy="126" r="16" fill="#111" stroke="#C9A227" stroke-width="3.5"/>
+      <circle cx="70" cy="126" r="6" fill="#444"/>
+      <circle cx="130" cy="126" r="16" fill="#111" stroke="#C9A227" stroke-width="3.5"/>
+      <circle cx="130" cy="126" r="6" fill="#444"/>
+      <rect x="36" y="96" width="14" height="24" rx="2" fill="#888"/>
+      <path id="botArc2" d="M 22,108 A 78,78 0 0,0 178,108" fill="none"/>
+      <text font-family="Arial Black" font-size="14" fill="#fff" letter-spacing="2">
+        <textPath href="#botArc2" startOffset="12%">CLUB OFF ROAD</textPath>
+      </text>
+      <text x="100" y="188" text-anchor="middle" fill="#C9A227" font-family="Arial" font-size="9" letter-spacing="2">NÃO TEM REGRA</text>
+    </svg>
+  </div>
+
+  <div class="cta-green-line"></div>
+
+  <h2 class="cta-title">Bora Pra Trilha?</h2>
+  <p class="cta-sub">Segue a gente no Instagram e fica por dentro de todos os rolés</p>
+
+  <a href="https://instagram.com/offroadsemjuizo" target="_blank" rel="noopener" class="cta-btn">
+    <i class="fab fa-instagram"></i>
+    @OffRoadSemJuizo
+  </a>
+
+  <div class="site-footer">
+    <p>Clube Offroad Sem Juízo © 2026</p>
+    <p>Única Regra: Não Tem Regra</p>
+  </div>
+</section>
+
+</body>
+</html>
