@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import LogoSvg from './LogoSvg'
 
 const InstaIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -30,8 +29,8 @@ export default function Nav() {
     >
       {/* Brand */}
       <a href="#home" className="flex items-center gap-3 group">
-        <div className="w-11 h-11 rounded-full overflow-hidden bg-white flex items-center justify-center flex-shrink-0">
-          <LogoSvg size={44} />
+        <div className="w-11 h-11 flex-shrink-0">
+          <img src="/logo.png" alt="Logo Club OffRoad Sem Juízo" className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
         </div>
         <span className="font-display text-gold text-xl tracking-[0.2em] hidden sm:block group-hover:text-gold-dark transition-colors">
           Offroad Sem Juízo

@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import LogoSvg from './LogoSvg'
 
 const InstaIcon = () => (
   <svg className="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -16,9 +15,9 @@ export default function Cta() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-        className="w-36 h-36 rounded-full bg-white flex items-center justify-center overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.9)]"
+        className="w-36 h-36"
       >
-        <LogoSvg size={144} />
+        <img src="/logo.png" alt="Logo Club OffRoad Sem Juízo" className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
       </motion.div>
 
       {/* Scan accent lines */}

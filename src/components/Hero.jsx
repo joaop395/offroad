@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import LogoSvg from './LogoSvg'
 
 const InstaIcon = () => (
   <svg className="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -21,10 +20,18 @@ export default function Hero() {
     <section
       id="home"
       className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-6 pb-24"
-      style={{ background: 'radial-gradient(ellipse at 50% 38%, #141408 0%, #0a0a0a 68%)' }}
     >
+      {/* Background image from Figma */}
+      <img
+        src="https://images.unsplash.com/photo-1773522918526-19adcbba988d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920"
+        alt="Jeep off-road adventure"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-offblack/75" />
+
       {/* Static top accent line */}
-      <div className="absolute top-[72px] left-0 right-0 h-px bg-green-500/50" />
+      <div className="absolute top-[72px] left-0 right-0 h-px bg-green-500/50 z-10" />
 
       {/* Animated scan line */}
       <div
@@ -37,32 +44,37 @@ export default function Hero() {
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="flex flex-col items-center"
+        className="relative z-10 flex flex-col items-center"
       >
-        {/* Logo box */}
+        {/* Logo — círculo branco para contrastar com o PNG */}
         <motion.div
           variants={fadeUp}
-          className="w-44 h-44 bg-white flex items-center justify-center mb-10 shadow-[0_0_60px_rgba(0,0,0,0.8)]"
+          className="w-44 h-44 mb-10"
         >
-          <LogoSvg size={176} />
+          <img src="/logo.png" alt="Logo Club OffRoad Sem Juízo" className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.6)]" />
         </motion.div>
 
         {/* Main title */}
         <motion.h1
           variants={fadeUp}
-          className="font-display text-gold leading-none mb-5 tracking-[0.06em]"
+          className="font-display text-gold leading-none mb-3 tracking-[0.06em]"
           style={{ fontSize: 'clamp(54px, 10vw, 96px)' }}
         >
-          Bora Pra Trilha?
+          Offroad
+        </motion.h1>
+        <motion.h1
+          variants={fadeUp}
+          className="font-display text-white leading-none mb-5 tracking-[0.06em]"
+          style={{ fontSize: 'clamp(54px, 10vw, 96px)' }}
+        >
+          Sem Juízo
         </motion.h1>
 
         {/* Subtitle */}
-        <motion.p
-          variants={fadeUp}
-          className="font-mono text-white/65 text-sm tracking-[0.18em] mb-11 max-w-sm"
-        >
-          Segue a gente no Instagram e fica por dentro de todos os rolés
-        </motion.p>
+        <motion.div variants={fadeUp} className="flex flex-col items-center mb-11">
+          <p className="font-mono text-gold/80 text-sm tracking-[0.3em] uppercase">Única Regra</p>
+          <p className="font-mono text-white/50 text-sm tracking-[0.3em] uppercase">Não Tem Regra</p>
+        </motion.div>
 
         {/* CTA */}
         <motion.a
@@ -80,7 +92,7 @@ export default function Hero() {
       </motion.div>
 
       {/* Bottom footer strip */}
-      <div className="absolute bottom-0 left-0 right-0 border-t border-white/[0.08] py-5 text-center">
+      <div className="absolute bottom-0 left-0 right-0 z-10 border-t border-white/[0.08] py-5 text-center">
         <p className="font-mono text-gold/55 text-[10px] tracking-[0.35em] uppercase">
           Clube Offroad Sem Juízo © 2026
         </p>

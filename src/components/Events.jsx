@@ -18,36 +18,49 @@ const PinIcon = () => (
 
 const EVENTS = [
   {
-    badge:      'Média',
-    badgeCls:   'bg-[#D4682A]',
-    name:       'Trilha da Cachoeira',
-    date:       '20 Abr 2026',
-    location:   'Serra do Mar',
+    badge:    'Média',
+    badgeCls: 'bg-[#D4682A]',
+    name:     'Trilha da Cachoeira',
+    date:     '20 Abr 2026',
+    location: 'Serra do Mar',
   },
   {
-    badge:      'Alta',
-    badgeCls:   'bg-[#C0392B]',
-    name:       'Rali Noturno',
-    date:       '04 Mai 2026',
-    location:   'Interior SP',
+    badge:    'Alta',
+    badgeCls: 'bg-[#C0392B]',
+    name:     'Rali Noturno',
+    date:     '04 Mai 2026',
+    location: 'Interior SP',
   },
   {
-    badge:      'Baixa',
-    badgeCls:   'bg-[#27AE60]',
-    name:       'Acampamento Off-Road',
-    date:       '15 Mai 2026',
-    location:   'Minas Gerais',
+    badge:    'Baixa',
+    badgeCls: 'bg-[#27AE60]',
+    name:     'Acampamento Off-Road',
+    date:     '15 Mai 2026',
+    location: 'Minas Gerais',
   },
 ]
 
 export default function Events() {
   return (
-    <section
-      id="eventos"
-      className="relative py-28 overflow-hidden diag-texture"
-      style={{ background: '#4A5C28' }}
-    >
-      {/* Decorative diagonal strokes */}
+    <section id="eventos" className="relative py-28 overflow-hidden">
+      {/* Vídeo de fundo */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay escuro com glow verde-militar */}
+      <div className="absolute inset-0 bg-offblack/70" />
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse at 50% 50%, rgba(74,92,40,0.55) 0%, transparent 70%)'
+      }} />
+
+      {/* Listras diagonais */}
       <div className="absolute top-8 -left-10 w-72 h-px bg-white/10 rotate-[-11deg]" />
       <div className="absolute bottom-12 -right-6 w-56 h-px bg-white/10 rotate-[-11deg]" />
       <div className="absolute top-1/2 -left-16 w-40 h-px bg-gold/10 rotate-[-11deg]" />
@@ -58,7 +71,7 @@ export default function Events() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="text-center mb-16 px-6"
+        className="relative z-10 text-center mb-16 px-6"
       >
         <p className="font-mono text-gold/50 text-[10px] tracking-[0.4em] uppercase mb-3">— agenda —</p>
         <h2
@@ -70,11 +83,11 @@ export default function Events() {
       </motion.div>
 
       {/* Cards */}
-      <div className="max-w-5xl mx-auto px-6 md:px-10 grid md:grid-cols-3 gap-5">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-10 grid md:grid-cols-3 gap-5">
         {EVENTS.map(({ badge, badgeCls, name, date, location }, i) => (
           <motion.div
             key={i}
-            className="relative bg-card border border-gold/70 p-8 group"
+            className="relative bg-offblack/60 backdrop-blur-sm border border-gold/70 p-8 group"
             initial={{ opacity: 0, y: 44 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -87,9 +100,7 @@ export default function Events() {
             }}
           >
             {/* Difficulty badge */}
-            <span
-              className={`absolute top-0 right-0 ${badgeCls} text-white font-mono text-[10px] tracking-[0.2em] uppercase px-4 py-1.5`}
-            >
+            <span className={`absolute top-0 right-0 ${badgeCls} text-white font-mono text-[10px] tracking-[0.2em] uppercase px-4 py-1.5`}>
               {badge}
             </span>
 
