@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Event {
+  id            Int            @id @default(autoincrement())
+  name          String
+  date          DateTime
+  location      String
+  difficulty    Difficulty
+  priceAdult    Float
+  priceChild    Float
+  maxSlots      Int
+  registrations Registration[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Registration {
+  id               Int      @id @default(autoincrement())
+  eventId          Int
+  event            Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  responsibleName  String
+  responsiblePhone String
+  email            String
+  adults           Int
+  children         Int
+  totalPaid        Float
+  mpPaymentId      String   @unique
+  paidAt           DateTime @default(now())
+}
+
+model Settings {
+  id             Int    @id @default(1)
+  whatsappNumber String @default("")
+}
+
+enum Difficulty {
+  LEVE_4X4
+  LEVE_AT_4X4
+  MODERADA_AT
+  MODERADA_MUD
+  AVANCADA
+}

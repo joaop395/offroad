@@ -4,6 +4,12 @@ dist/
 .env.local
 .DS_Store
 *.local
+
+# Backend
+backend/node_modules/
+backend/.env
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
 scrape-figma.mjs
 figma-content.json
 figma-screenshot.png
