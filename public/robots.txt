@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /offroad-admin
+Disallow: /offroad-admin/
+
+Sitemap: /sitemap.xml
