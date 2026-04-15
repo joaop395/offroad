@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+import { API_BASE } from '../lib/api'
 
 const AuthContext = createContext(null)
 
@@ -8,7 +7,7 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => sessionStorage.getItem('admin_token'))
 
   const login = useCallback(async (email, password) => {
-    const res = await fetch(`${API}/api/auth/login`, {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -23,7 +22,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch(`${API}/api/auth/logout`, {
+      await fetch(`${API_BASE}/api/auth/logout`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include',
@@ -34,7 +33,7 @@ export function AuthProvider({ children }) {
   }, [token])
 
   const refresh = useCallback(async () => {
-    const res = await fetch(`${API}/api/auth/refresh`, {
+    const res = await fetch(`${API_BASE}/api/auth/refresh`, {
       method: 'POST',
       credentials: 'include',
     })

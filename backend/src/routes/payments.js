@@ -9,6 +9,8 @@ const mp = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
 })
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1'])
+
 const checkoutSchema = z.object({
   eventId:         z.number().int().positive(),
   adults:          z.number().int().min(0),
@@ -72,11 +74,58 @@ function normalizePaymentMetadata(metadata) {
   }
 }
 
+function normalizeUrl(value) {
+  const trimmed = String(value ?? '').trim()
+  if (!trimmed) return null
+
+  try {
+    const url = new URL(trimmed)
+    return url.toString().replace(/\/+$/, '')
+  } catch {
+    return null
+  }
+}
+
+function resolveFrontendOrigin(originHeader) {
+  const configuredOrigins = String(process.env.FRONTEND_URL ?? '')
+    .split(',')
+    .map(value => normalizeUrl(value))
+    .filter(Boolean)
+
+  const requestOrigin = normalizeUrl(originHeader)
+
+  if (requestOrigin) return requestOrigin
+  if (configuredOrigins.length > 0) return configuredOrigins[0]
+
+  return 'http://localhost:3000'
+}
+
+function resolveWebhookBaseUrl() {
+  const configured = normalizeUrl(process.env.BACKEND_URL)
+  if (!configured) return null
+
+  const hostname = new URL(configured).hostname
+  if (LOOPBACK_HOSTS.has(hostname)) return null
+
+  return configured
+}
+
+function hasMercadoPagoCredentials() {
+  const token = String(process.env.MP_ACCESS_TOKEN ?? '').trim()
+  return token && !['TEST-TROQUE', 'TROQUE'].includes(token)
+}
+
 // POST /api/payments/checkout
 router.post('/checkout', async (req, res) => {
   const result = checkoutSchema.safeParse(req.body)
   if (!result.success) {
     return res.status(400).json({ error: result.error.flatten() })
+  }
+
+  if (!hasMercadoPagoCredentials()) {
+    return res.status(503).json({
+      error: 'Pagamento indisponível no momento. Falta configurar o Mercado Pago no servidor.',
+    })
   }
 
   const { eventId, adults, children, responsibleName, responsiblePhone, email } = result.data
@@ -97,32 +146,48 @@ router.post('/checkout', async (req, res) => {
   // Total calculado no backend — nunca aceita valor do frontend
   const total = (adults * event.priceAdult) + (children * event.priceChild)
 
-  const frontendUrl = process.env.FRONTEND_URL
+  const frontendUrl = resolveFrontendOrigin(req.headers.origin)
+  const webhookBaseUrl = resolveWebhookBaseUrl()
 
-  const preference = new Preference(mp)
-  const pref = await preference.create({
-    body: {
-      items: [{
-        title: event.name,
-        quantity: 1,
-        unit_price: total,
-        currency_id: 'BRL',
-        description: `${adults} adulto(s) + ${children} criança(s)`,
-      }],
-      payer: { email, name: responsibleName },
-      back_urls: {
-        success: `${frontendUrl}/inscricao/sucesso`,
-        failure: `${frontendUrl}/inscricao/erro`,
-        pending: `${frontendUrl}/inscricao/pendente`,
+  try {
+    const preference = new Preference(mp)
+    const pref = await preference.create({
+      body: {
+        items: [{
+          title: event.name,
+          quantity: 1,
+          unit_price: total,
+          currency_id: 'BRL',
+          description: `${adults} adulto(s) + ${children} criança(s)`,
+        }],
+        payer: { email, name: responsibleName },
+        back_urls: {
+          success: `${frontendUrl}/inscricao/sucesso`,
+          failure: `${frontendUrl}/inscricao/erro`,
+          pending: `${frontendUrl}/inscricao/pendente`,
+        },
+        auto_return: 'approved',
+        ...(webhookBaseUrl ? { notification_url: `${webhookBaseUrl}/api/payments/webhook` } : {}),
+        // Metadados para recuperar no webhook
+        metadata: buildCheckoutMetadata({ eventId, adults, children, responsibleName, responsiblePhone, email, total }),
       },
-      auto_return: 'approved',
-      notification_url: `${process.env.BACKEND_URL ?? ''}/api/payments/webhook`,
-      // Metadados para recuperar no webhook
-      metadata: buildCheckoutMetadata({ eventId, adults, children, responsibleName, responsiblePhone, email, total }),
-    },
-  })
+    })
 
-  res.json({ initPoint: pref.init_point, preferenceId: pref.id })
+    res.json({ initPoint: pref.init_point, preferenceId: pref.id })
+  } catch (error) {
+    console.error(error)
+
+    const status = Number(error?.status ?? error?.cause?.status)
+    if (status === 401 || status === 403) {
+      return res.status(503).json({
+        error: 'Pagamento indisponível no momento. Credenciais do Mercado Pago inválidas ou não autorizadas.',
+      })
+    }
+
+    return res.status(502).json({
+      error: 'Falha ao iniciar o pagamento. Revise a configuração do Mercado Pago e tente novamente.',
+    })
+  }
 })
 
 // POST /api/payments/webhook — Mercado Pago notifica aqui

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+import { API_BASE } from '../lib/api'
 
 const DIFF = {
   LEVE_4X4:    { label: 'Leve 4x4',           color: '#27AE60' },
@@ -92,7 +91,7 @@ export default function RegistrationModal({ event, onClose }) {
     setSubmitError('')
     setSubmitting(true)
     try {
-      const res = await fetch(`${API}/api/payments/checkout`, {
+      const res = await fetch(`${API_BASE}/api/payments/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

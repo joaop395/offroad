@@ -11,12 +11,30 @@ import settingsRoutes from './routes/settings.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const allowedOrigins = [
+  ...new Set([
+    ...String(process.env.FRONTEND_URL ?? '')
+      .split(',')
+      .map(origin => origin.trim())
+      .filter(Boolean),
+    'http://localhost:5173',
+    'http://localhost:3000',
+  ]),
+]
 
 // ── Segurança ──────────────────────────────────────────────────────────────
+app.set('trust proxy', 1)
+
 app.use(helmet())
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true)
+    }
+
+    return callback(new Error('Origem não permitida pelo CORS.'))
+  },
   credentials: true,
 }))
 

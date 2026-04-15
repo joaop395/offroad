@@ -1,13 +1,12 @@
 import { useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
-
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+import { API_BASE } from '../lib/api'
 
 export function useApi() {
   const { token, refresh, logout } = useAuth()
 
   const apiFetch = useCallback(async (path, options = {}) => {
-    const doRequest = async (t) => fetch(`${API}${path}`, {
+    const doRequest = async (t) => fetch(`${API_BASE}${path}`, {
       ...options,
       credentials: 'include',
       headers: {
@@ -33,5 +32,5 @@ export function useApi() {
     return res
   }, [token, refresh, logout])
 
-  return { apiFetch, apiBase: API }
+  return { apiFetch, apiBase: API_BASE }
 }

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import RegistrationModal from './RegistrationModal'
-
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+import { API_BASE } from '../lib/api'
 
 const DIFF = {
   LEVE_4X4:    { label: 'Leve 4x4',           color: '#27AE60' },
@@ -40,7 +39,7 @@ export default function Events() {
   const [selected, setSelected] = useState(null) // evento aberto no modal
 
   useEffect(() => {
-    fetch(`${API}/api/events`)
+    fetch(`${API_BASE}/api/events`)
       .then(r => r.json())
       .then(setEvents)
       .catch(() => {})

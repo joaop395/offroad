@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-
-const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+import { API_BASE } from '../lib/api'
 
 export default function SuccessPage() {
   const [params] = useSearchParams()
@@ -45,7 +44,7 @@ export default function SuccessPage() {
 
   useEffect(() => {
     // Busca número do WhatsApp do admin nas configurações públicas
-    fetch(`${API}/api/settings/public`)
+    fetch(`${API_BASE}/api/settings/public`)
       .then(r => r.json())
       .then(d => setWhatsapp(d.whatsappNumber ?? ''))
       .catch(() => {})
