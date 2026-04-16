@@ -68,7 +68,7 @@ Requer `Authorization: Bearer <token>`.
 ## Como usar o access token
 
 ```http
-GET /api/events/1/registrations
+GET /api/own-events/1/registrations
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
@@ -82,7 +82,7 @@ TOKEN=$(curl -s -c cookies.txt -X POST http://localhost:3001/api/auth/login \
   | jq -r .accessToken)
 
 # Usar token
-curl http://localhost:3001/api/events \
+curl http://localhost:3001/api/own-events \
   -H "Authorization: Bearer $TOKEN"
 
 # Refresh

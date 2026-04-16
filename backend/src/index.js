@@ -3,24 +3,59 @@ import helmet from 'helmet'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { rateLimit } from 'express-rate-limit'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 import authRoutes from './routes/auth.js'
+import calendarEventsRoutes from './routes/calendar-events.js'
 import eventsRoutes from './routes/events.js'
+import partnerEventsRoutes from './routes/partner-events.js'
 import paymentsRoutes from './routes/payments.js'
 import settingsRoutes from './routes/settings.js'
+import { ensureUploadsReady } from './lib/partnerEventUploads.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+function normalizeOrigin(value) {
+  const trimmed = String(value ?? '').trim()
+  if (!trimmed) return null
+
+  try {
+    return new URL(trimmed).origin
+  } catch {
+    return null
+  }
+}
+
 const allowedOrigins = [
   ...new Set([
     ...String(process.env.FRONTEND_URL ?? '')
       .split(',')
-      .map(origin => origin.trim())
+      .map(origin => normalizeOrigin(origin))
       .filter(Boolean),
     'http://localhost:5173',
     'http://localhost:3000',
+    'https://offroadsemjuizo.com.br',
+    'http://offroadsemjuizo.com.br',
+    'https://www.offroadsemjuizo.com.br',
+    'http://www.offroadsemjuizo.com.br',
   ]),
 ]
+
+const allowedHosts = new Set(
+  allowedOrigins
+    .map(origin => {
+      try {
+        return new URL(origin).hostname
+      } catch {
+        return null
+      }
+    })
+    .filter(Boolean),
+)
 
 // ── Segurança ──────────────────────────────────────────────────────────────
 app.set('trust proxy', 1)
@@ -29,11 +64,20 @@ app.use(helmet())
 
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    const normalizedOrigin = normalizeOrigin(origin)
+
+    if (!origin || !normalizedOrigin) {
       return callback(null, true)
     }
 
-    return callback(new Error('Origem não permitida pelo CORS.'))
+    try {
+      const { hostname } = new URL(normalizedOrigin)
+      if (allowedOrigins.includes(normalizedOrigin) || allowedHosts.has(hostname)) {
+        return callback(null, true)
+      }
+    } catch {}
+
+    return callback(null, false)
   },
   credentials: true,
 }))
@@ -52,10 +96,14 @@ app.use(rateLimit({
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
 app.use(express.json())
 app.use(cookieParser())
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
 
 // ── Rotas ──────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes)
+app.use('/api/calendar-events', calendarEventsRoutes)
+app.use('/api/own-events', eventsRoutes)
 app.use('/api/events', eventsRoutes)
+app.use('/api/partner-events', partnerEventsRoutes)
 app.use('/api/payments', paymentsRoutes)
 app.use('/api/settings', settingsRoutes)
 
@@ -67,6 +115,13 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Erro interno do servidor.' })
 })
 
-app.listen(PORT, () => {
-  console.log(`Backend rodando na porta ${PORT}`)
-})
+ensureUploadsReady()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Backend rodando na porta ${PORT}`)
+    })
+  })
+  .catch((error) => {
+    console.error('Falha ao preparar diretórios de upload', error)
+    process.exit(1)
+  })

@@ -12,13 +12,19 @@ backend/
 │   ├── index.js          ← servidor Express (entry point)
 │   ├── lib/
 │   │   └── prisma.js     ← cliente Prisma singleton
+│   │   ├── calendarEvents.js      ← normalização pública do calendário
+│   │   └── partnerEventUploads.js ← upload/local path de banners
 │   ├── middleware/
 │   │   └── auth.js       ← JWT verify middleware
 │   └── routes/
 │       ├── auth.js       ← /api/auth/*
-│       ├── events.js     ← /api/events/*
+│       ├── events.js     ← /api/own-events/* (alias legado: /api/events/*)
+│       ├── calendar-events.js ← /api/calendar-events
+│       ├── partner-events.js  ← /api/partner-events/*
 │       ├── payments.js   ← /api/payments/*
 │       └── settings.js   ← /api/settings
+├── uploads/
+│   └── partner-events/   ← banners enviados pelo admin
 ├── .env                  ← variáveis locais (não commitado)
 ├── .env.example          ← template das variáveis
 └── package.json
@@ -84,3 +90,11 @@ npm run db:seed
 # 4. Iniciar servidor
 npm run dev
 ```
+
+## Observações de arquitetura
+
+- Eventos próprios usam `classification` como enum canônico no lugar de `difficulty`
+- A rota pública principal para UI é `GET /api/calendar-events`
+- A rota canônica de eventos próprios é `/api/own-events`
+- `/api/events` permanece apenas como alias legado de compatibilidade
+- Eventos parceiros têm CRUD separado e não entram no fluxo de inscrição/pagamento

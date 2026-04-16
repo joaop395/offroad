@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-const DIFFICULTIES = [
+import { API_PATHS } from '../../lib/api'
+
+const CLASSIFICATIONS = [
   { value: 'LEVE_4X4',     label: 'Leve 4x4' },
   { value: 'LEVE_AT_4X4',  label: 'Leve · Pneu AT' },
   { value: 'MODERADA_AT',  label: 'Moderada · Pneu AT' },
   { value: 'MODERADA_MUD', label: 'Moderada · Pneu Mud' },
   { value: 'AVANCADA',     label: 'Avançada · Lift + Preparados' },
+  { value: 'REUNIAO',      label: 'Reunião' },
 ]
 
 function toLocalDatetime(iso) {
@@ -22,7 +25,7 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
     name:       initial?.name ?? '',
     date:       toLocalDatetime(initial?.date),
     location:   initial?.location ?? '',
-    difficulty: initial?.difficulty ?? 'LEVE_4X4',
+    classification: initial?.classification ?? 'LEVE_4X4',
     priceAdult: initial?.priceAdult ?? '',
     priceChild: initial?.priceChild ?? '',
     maxSlots:   initial?.maxSlots ?? '',
@@ -32,6 +35,19 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }))
+  }
+
+  function extractErrorMessage(error) {
+    if (!error) return 'Erro ao salvar evento.'
+    if (typeof error === 'string') return error
+
+    if (error?.fieldErrors) {
+      const firstFieldError = Object.values(error.fieldErrors).flat().find(Boolean)
+      if (firstFieldError) return firstFieldError
+    }
+
+    if (error?.formErrors?.length) return error.formErrors[0]
+    return 'Erro ao salvar evento.'
   }
 
   async function handleSubmit(e) {
@@ -46,11 +62,11 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
         priceChild: Number(form.priceChild),
         maxSlots:   Number(form.maxSlots),
       }
-      const url    = isEditing ? `/api/events/${initial.id}` : '/api/events'
+      const url    = isEditing ? `${API_PATHS.ownEvents}/${initial.id}` : API_PATHS.ownEvents
       const method = isEditing ? 'PUT' : 'POST'
       const res    = await apiFetch(url, { method, body: JSON.stringify(body) })
       const data   = await res.json()
-      if (!res.ok) throw new Error(JSON.stringify(data.error))
+      if (!res.ok) throw new Error(extractErrorMessage(data.error))
       onSave()
     } catch (err) {
       setError(err.message)
@@ -93,16 +109,16 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
           </div>
 
           <div>
-            <label className={labelCls}>Dificuldade</label>
-            <select value={form.difficulty} onChange={e => set('difficulty', e.target.value)} className={inputCls + ' cursor-pointer'}>
-              {DIFFICULTIES.map(d => (
+            <label className={labelCls}>Classificação</label>
+            <select value={form.classification} onChange={e => set('classification', e.target.value)} className={inputCls + ' cursor-pointer'}>
+              {CLASSIFICATIONS.map(d => (
                 <option key={d.value} value={d.value}>{d.label}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className={labelCls}>Vagas máximas</label>
+            <label className={labelCls}>Vagas máximas obrigatórias</label>
             <input type="number" value={form.maxSlots} onChange={e => set('maxSlots', e.target.value)} required min={1} className={inputCls} />
           </div>
 

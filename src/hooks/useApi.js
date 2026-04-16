@@ -6,11 +6,13 @@ export function useApi() {
   const { token, refresh, logout } = useAuth()
 
   const apiFetch = useCallback(async (path, options = {}) => {
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
+
     const doRequest = async (t) => fetch(`${API_BASE}${path}`, {
       ...options,
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options.headers ?? {}),
         ...(t ? { Authorization: `Bearer ${t}` } : {}),
       },

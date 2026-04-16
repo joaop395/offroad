@@ -60,3 +60,121 @@ body::after {
     rgba(255,255,255,0.018) 29px
   );
 }
+
+/* ── Events mud background ────────────────────────────────── */
+@keyframes mudDriftA {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(2.5%, -2%, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes mudDriftB {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-2%, 2.5%, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes dustShift {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0.22; }
+  50%  { transform: translate3d(-1.5%, 1%, 0); opacity: 0.28; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.22; }
+}
+
+.events-mud-base {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(91, 67, 31, 0.38) 0%, rgba(91, 67, 31, 0) 34%),
+    radial-gradient(circle at 82% 16%, rgba(55, 61, 27, 0.22) 0%, rgba(55, 61, 27, 0) 28%),
+    linear-gradient(145deg, #17120d 0%, #100d09 42%, #090909 100%);
+}
+
+.events-mud-vignette {
+  background:
+    radial-gradient(circle at top, rgba(210, 162, 79, 0.08) 0%, rgba(22, 17, 12, 0.05) 36%, rgba(7, 7, 7, 0.82) 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.08) 0%, rgba(10, 10, 10, 0.42) 45%, rgba(8, 8, 8, 0.72) 100%);
+}
+
+.events-mud-blob {
+  filter: blur(42px);
+  border-radius: 42% 58% 51% 49% / 47% 41% 59% 53%;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+
+.events-mud-blob-a {
+  top: 10%;
+  left: -8%;
+  width: 34rem;
+  height: 22rem;
+  background:
+    radial-gradient(circle at 38% 46%, rgba(108, 76, 34, 0.48) 0%, rgba(73, 49, 20, 0.28) 42%, rgba(73, 49, 20, 0) 78%);
+  animation: mudDriftA 22s ease-in-out infinite;
+}
+
+.events-mud-blob-b {
+  top: 18%;
+  right: -8%;
+  width: 28rem;
+  height: 20rem;
+  background:
+    radial-gradient(circle at 54% 44%, rgba(65, 78, 32, 0.26) 0%, rgba(50, 58, 22, 0.16) 40%, rgba(50, 58, 22, 0) 78%);
+  animation: mudDriftB 26s ease-in-out infinite;
+}
+
+.events-mud-blob-c {
+  bottom: 2%;
+  left: 18%;
+  width: 30rem;
+  height: 19rem;
+  background:
+    radial-gradient(circle at 48% 50%, rgba(88, 61, 26, 0.38) 0%, rgba(67, 45, 18, 0.24) 46%, rgba(67, 45, 18, 0) 78%);
+  animation: mudDriftB 24s ease-in-out infinite reverse;
+}
+
+.events-mud-blob-d {
+  bottom: -6%;
+  right: 12%;
+  width: 26rem;
+  height: 17rem;
+  background:
+    radial-gradient(circle at 46% 48%, rgba(52, 44, 24, 0.34) 0%, rgba(38, 33, 18, 0.16) 44%, rgba(38, 33, 18, 0) 80%);
+  animation: mudDriftA 28s ease-in-out infinite reverse;
+}
+
+.events-dust {
+  opacity: 0.22;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 280px 280px;
+  mix-blend-mode: soft-light;
+  animation: dustShift 18s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .events-mud-blob-a {
+    top: 14%;
+    left: -24%;
+    width: 20rem;
+    height: 15rem;
+  }
+
+  .events-mud-blob-b {
+    top: 9%;
+    right: -18%;
+    width: 17rem;
+    height: 14rem;
+  }
+
+  .events-mud-blob-c {
+    bottom: 15%;
+    left: -8%;
+    width: 18rem;
+    height: 13rem;
+  }
+
+  .events-mud-blob-d {
+    right: -10%;
+    bottom: 3%;
+    width: 16rem;
+    height: 12rem;
+  }
+}

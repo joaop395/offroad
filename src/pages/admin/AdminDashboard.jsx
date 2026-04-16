@@ -2,16 +2,19 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useApi } from '../../hooks/useApi'
+import { API_PATHS } from '../../lib/api'
 import EventForm from './EventForm'
+import PartnerEventForm from './PartnerEventForm'
 import RegistrationsList from './RegistrationsList'
 import AdminSettings from './AdminSettings'
 
-const DIFF_LABELS = {
+const CLASSIFICATION_LABELS = {
   LEVE_4X4:    { label: 'Leve 4x4',          color: '#27AE60' },
   LEVE_AT_4X4: { label: 'Leve · Pneu AT',    color: '#2ECC71' },
   MODERADA_AT: { label: 'Moderada · Pneu AT', color: '#D4682A' },
   MODERADA_MUD:{ label: 'Moderada · Pneu Mud',color: '#E67E22' },
   AVANCADA:    { label: 'Avançada · Lift',    color: '#C0392B' },
+  REUNIAO:     { label: 'Reunião',            color: '#4C6A92' },
 }
 
 function formatDate(iso) {
@@ -25,17 +28,21 @@ export default function AdminDashboard() {
   const { apiFetch } = useApi()
   const navigate = useNavigate()
 
-  const [tab, setTab]           = useState('events') // 'events' | 'settings'
+  const [tab, setTab]           = useState('own-events') // 'own-events' | 'partner-events' | 'settings'
   const [events, setEvents]     = useState([])
   const [loading, setLoading]   = useState(true)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing]   = useState(null)
   const [viewingId, setViewingId] = useState(null)
+  const [partnerEvents, setPartnerEvents] = useState([])
+  const [partnerLoading, setPartnerLoading] = useState(true)
+  const [partnerFormOpen, setPartnerFormOpen] = useState(false)
+  const [editingPartner, setEditingPartner] = useState(null)
 
   const fetchEvents = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await apiFetch('/api/events')
+      const res = await apiFetch(API_PATHS.ownEvents)
       const data = await res.json()
       setEvents(data)
     } finally {
@@ -43,17 +50,35 @@ export default function AdminDashboard() {
     }
   }, [apiFetch])
 
+  const fetchPartnerEvents = useCallback(async () => {
+    setPartnerLoading(true)
+    try {
+      const res = await apiFetch(API_PATHS.partnerEvents)
+      const data = await res.json()
+      setPartnerEvents(data)
+    } finally {
+      setPartnerLoading(false)
+    }
+  }, [apiFetch])
+
   useEffect(() => { fetchEvents() }, [fetchEvents])
+  useEffect(() => { fetchPartnerEvents() }, [fetchPartnerEvents])
 
   async function handleDelete(id) {
     if (!confirm('Tem certeza que deseja excluir este evento? As inscrições também serão removidas.')) return
-    await apiFetch(`/api/events/${id}`, { method: 'DELETE' })
+    await apiFetch(`${API_PATHS.ownEvents}/${id}`, { method: 'DELETE' })
     fetchEvents()
   }
 
   async function handleLogout() {
     await logout()
     navigate('/offroad-admin', { replace: true })
+  }
+
+  async function handleDeletePartner(id) {
+    if (!confirm('Tem certeza que deseja excluir este evento parceiro?')) return
+    await apiFetch(`${API_PATHS.partnerEvents}/${id}`, { method: 'DELETE' })
+    fetchPartnerEvents()
   }
 
   return (
@@ -76,7 +101,7 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <nav className="relative z-10 border-b border-white/10 px-6 flex gap-6">
-        {[['events', 'Eventos'], ['settings', 'Configurações']].map(([key, label]) => (
+        {[['own-events', 'Eventos próprios'], ['partner-events', 'Eventos parceiros'], ['settings', 'Configurações']].map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -94,7 +119,7 @@ export default function AdminDashboard() {
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-8">
         {tab === 'settings' && <AdminSettings apiFetch={apiFetch} />}
 
-        {tab === 'events' && (
+        {tab === 'own-events' && (
           <>
             {/* Tela de inscritos */}
             {viewingId && (
@@ -139,7 +164,7 @@ export default function AdminDashboard() {
 
                 <div className="space-y-3">
                   {events.map(ev => {
-                    const diff = DIFF_LABELS[ev.difficulty]
+                    const classification = CLASSIFICATION_LABELS[ev.classification] ?? CLASSIFICATION_LABELS.LEVE_4X4
                     const available = ev.maxSlots - ev.slotsUsed
                     return (
                       <div
@@ -152,9 +177,9 @@ export default function AdminDashboard() {
                           <div className="flex items-center gap-3 mb-1">
                             <span
                               className="font-mono text-[10px] tracking-[0.2em] uppercase px-2 py-0.5"
-                              style={{ backgroundColor: diff.color, color: '#fff' }}
+                              style={{ backgroundColor: classification.color, color: '#fff' }}
                             >
-                              {diff.label}
+                              {classification.label}
                             </span>
                           </div>
                           <h3 className="font-display text-gold text-xl tracking-wide">{ev.name}</h3>
@@ -189,6 +214,94 @@ export default function AdminDashboard() {
                       </div>
                     )
                   })}
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {tab === 'partner-events' && (
+          <>
+            {partnerFormOpen && (
+              <PartnerEventForm
+                initial={editingPartner}
+                apiFetch={apiFetch}
+                onSave={() => {
+                  setPartnerFormOpen(false)
+                  setEditingPartner(null)
+                  fetchPartnerEvents()
+                }}
+                onCancel={() => {
+                  setPartnerFormOpen(false)
+                  setEditingPartner(null)
+                }}
+              />
+            )}
+
+            {!partnerFormOpen && (
+              <>
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="font-display text-2xl tracking-widest text-gold">Eventos Parceiros</h2>
+                  <button
+                    onClick={() => { setEditingPartner(null); setPartnerFormOpen(true) }}
+                    className="bg-gold px-5 py-2.5 font-display text-sm uppercase tracking-[0.16em] text-offblack transition-colors hover:bg-gold-dark"
+                  >
+                    + Novo Parceiro
+                  </button>
+                </div>
+
+                {partnerLoading && (
+                  <p className="font-mono text-sm text-white/40">Carregando...</p>
+                )}
+
+                {!partnerLoading && partnerEvents.length === 0 && (
+                  <p className="font-mono text-sm text-white/40">Nenhum evento parceiro cadastrado.</p>
+                )}
+
+                <div className="space-y-3">
+                  {partnerEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="relative flex flex-col gap-4 border border-white/12 bg-card p-5 md:flex-row md:items-center"
+                    >
+                      <div className="absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-gold" />
+
+                      <div className="flex-1">
+                        <div className="mb-2 flex items-center gap-3">
+                          <span className="bg-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-white/76">
+                            Parceiro
+                          </span>
+                          {event.bannerUrl && (
+                            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/68">
+                              Com banner
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-display text-xl tracking-wide text-gold">{event.name}</h3>
+                        <p className="mt-1 font-mono text-xs text-white/50">
+                          {formatDate(event.date)}{event.location ? ` · ${event.location}` : ''}
+                        </p>
+                        <p className="mt-2 line-clamp-2 font-body text-sm leading-relaxed text-white/52">
+                          {event.description}
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setEditingPartner(event); setPartnerFormOpen(true) }}
+                          className="border border-gold/40 px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-gold transition-colors hover:bg-gold/10"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDeletePartner(event.id)}
+                          className="border border-red-800/50 px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-red-400 transition-colors hover:bg-red-900/20"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}

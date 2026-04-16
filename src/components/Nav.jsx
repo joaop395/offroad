@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { Link, useLocation } from 'react-router-dom'
 
 const InstaIcon = () => (
   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -9,12 +10,27 @@ const InstaIcon = () => (
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const navItems = [
+    { label: 'Sobre', to: '/#sobre', active: location.pathname === '/' && location.hash === '#sobre' },
+    { label: 'Galeria', to: '/#galeria', active: location.pathname === '/' && location.hash === '#galeria' },
+    { label: 'Eventos', to: '/eventos', active: location.pathname === '/eventos' },
+  ]
+
+  const solidNav = scrolled || location.pathname !== '/'
+  const handleBrandClick = () => {
+    if (location.pathname === '/' && !location.hash) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   return (
     <motion.nav
@@ -22,32 +38,39 @@ export default function Nav() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-3 transition-all duration-300 ${
-        scrolled
+        solidNav
           ? 'bg-offblack/96 backdrop-blur-sm border-b border-gold/20'
           : 'bg-transparent'
       }`}
     >
       {/* Brand */}
-      <a href="#home" className="flex items-center gap-3 group">
+      <Link to="/" onClick={handleBrandClick} className="flex items-center gap-3 group">
         <div className="w-11 h-11 flex-shrink-0">
           <img src="/logo.png" alt="Logo Club OffRoad Sem Juízo" className="w-full h-full object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
         </div>
         <span className="font-display text-gold text-xl tracking-[0.2em] hidden sm:block group-hover:text-gold-dark transition-colors">
           Offroad Sem Juízo
         </span>
-      </a>
+      </Link>
 
       {/* Links */}
       <ul className="flex items-center gap-8 list-none">
-        {['Sobre', 'Galeria', 'Eventos'].map(link => (
-          <li key={link} className="hidden md:block">
-            <a
-              href={`#${link.toLowerCase()}`}
-              className="font-body font-semibold text-[13px] tracking-[0.25em] text-white/80 uppercase hover:text-gold transition-colors duration-200 relative group"
+        {navItems.map(({ label, to, active }) => (
+          <li key={label} className="hidden md:block">
+            <Link
+              to={to}
+              className={`font-body font-semibold text-[13px] tracking-[0.25em] uppercase transition-colors duration-200 relative group ${
+                active ? 'text-gold' : 'text-white/80 hover:text-gold'
+              }`}
+              aria-current={active ? 'page' : undefined}
             >
-              {link}
-              <span className="absolute -bottom-1 left-0 right-0 h-px bg-gold scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-            </a>
+              {label}
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-px bg-gold transition-transform duration-300 origin-left ${
+                  active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`}
+              />
+            </Link>
           </li>
         ))}
         <li>

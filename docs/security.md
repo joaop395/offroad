@@ -30,6 +30,8 @@
 | Validação Zod | ✅ | Todos os inputs antes de tocar no banco |
 | Prisma parametrizado | ✅ | Zero SQL injection possível |
 | Raw body no webhook | ✅ | Necessário para verificar assinatura MP |
+| Contrato canônico de eventos próprios | ✅ | `/api/own-events` é a rota oficial; `/api/events` é apenas alias legado |
+| Upload de banner validado | ✅ | Apenas imagem, limite de tamanho e persistência controlada |
 
 ## Pagamentos
 
@@ -50,6 +52,7 @@
 | robots.txt | ✅ | Bloqueia indexação de /offroad-admin |
 | Token em sessionStorage | ✅ | Some ao fechar aba |
 | Auto-refresh transparente | ✅ | Renova token sem logout forçado |
+| Separação de domínios na UI | ✅ | Parceiros não exibem CTA de inscrição |
 
 ## Variáveis de ambiente
 
@@ -70,3 +73,4 @@
 - [ ] Configurar webhook no painel MP Developers com URL de produção
 - [ ] Garantir HTTPS no backend (necessário para cookie Secure)
 - [ ] Verificar que `backend/.env` e `prisma/dev.db` não estão no repositório
+- [ ] Garantir persistência/backup de `backend/uploads/partner-events` em produção

@@ -2,43 +2,33 @@ import { Router } from 'express'
 import { z } from 'zod'
 import prisma from '../lib/prisma.js'
 import { requireAuth } from '../middleware/auth.js'
+import { slotsUsed, withSlots } from '../lib/calendarEvents.js'
 
 const router = Router()
 
-const difficultyValues = ['LEVE_4X4', 'LEVE_AT_4X4', 'MODERADA_AT', 'MODERADA_MUD', 'AVANCADA']
+const classificationValues = ['LEVE_4X4', 'LEVE_AT_4X4', 'MODERADA_AT', 'MODERADA_MUD', 'AVANCADA', 'REUNIAO']
 
-const eventSchema = z.object({
-  name:       z.string().min(1).max(120),
-  date:       z.string().datetime(),
-  location:   z.string().min(1).max(200),
-  difficulty: z.enum(difficultyValues),
-  priceAdult: z.number().nonnegative(),
-  priceChild: z.number().nonnegative(),
-  maxSlots:   z.number().int().positive(),
-})
+const ownEventSchema = z.object({
+  name: z.string().trim().min(1, 'Nome do evento é obrigatório.').max(120),
+  date: z.string().datetime('Data e hora inválidas.'),
+  location: z.string().trim().min(1, 'Local é obrigatório.').max(200),
+  classification: z.enum(classificationValues, {
+    errorMap: () => ({ message: 'Classificação inválida.' }),
+  }),
+  priceAdult: z.number().nonnegative('Valor adulto não pode ser negativo.'),
+  priceChild: z.number().nonnegative('Valor criança não pode ser negativo.'),
+  maxSlots: z.number().int('Vagas devem ser um número inteiro.').positive('Vagas são obrigatórias e devem ser maiores que zero.'),
+}).strict()
 
-// Calcula vagas restantes para um evento
-async function slotsUsed(eventId) {
-  const agg = await prisma.registration.aggregate({
-    where: { eventId },
-    _sum: { adults: true, children: true },
-  })
-  return (agg._sum.adults ?? 0) + (agg._sum.children ?? 0)
-}
-
-// GET /api/events — público
+// GET /api/own-events — público
 router.get('/', async (_req, res) => {
   const events = await prisma.event.findMany({ orderBy: { date: 'asc' } })
-
-  const result = await Promise.all(events.map(async (e) => ({
-    ...e,
-    slotsUsed: await slotsUsed(e.id),
-  })))
+  const result = await Promise.all(events.map(withSlots))
 
   res.json(result)
 })
 
-// GET /api/events/:id/slots — público
+// GET /api/own-events/:id/slots — público
 router.get('/:id/slots', async (req, res) => {
   const id = Number(req.params.id)
   const event = await prisma.event.findUnique({ where: { id } })
@@ -48,7 +38,7 @@ router.get('/:id/slots', async (req, res) => {
   res.json({ maxSlots: event.maxSlots, slotsUsed: used, available: event.maxSlots - used })
 })
 
-// GET /api/events/:id/registrations — admin
+// GET /api/own-events/:id/registrations — admin
 router.get('/:id/registrations', requireAuth, async (req, res) => {
   const id = Number(req.params.id)
   const event = await prisma.event.findUnique({ where: { id } })
@@ -61,9 +51,9 @@ router.get('/:id/registrations', requireAuth, async (req, res) => {
   res.json(registrations)
 })
 
-// POST /api/events — admin
+// POST /api/own-events — admin
 router.post('/', requireAuth, async (req, res) => {
-  const result = eventSchema.safeParse(req.body)
+  const result = ownEventSchema.safeParse(req.body)
   if (!result.success) {
     return res.status(400).json({ error: result.error.flatten() })
   }
@@ -72,10 +62,10 @@ router.post('/', requireAuth, async (req, res) => {
   res.status(201).json(event)
 })
 
-// PUT /api/events/:id — admin
+// PUT /api/own-events/:id — admin
 router.put('/:id', requireAuth, async (req, res) => {
   const id = Number(req.params.id)
-  const result = eventSchema.safeParse(req.body)
+  const result = ownEventSchema.safeParse(req.body)
   if (!result.success) {
     return res.status(400).json({ error: result.error.flatten() })
   }
@@ -87,7 +77,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   res.json(event)
 })
 
-// DELETE /api/events/:id — admin
+// DELETE /api/own-events/:id — admin
 router.delete('/:id', requireAuth, async (req, res) => {
   const id = Number(req.params.id)
   const existing = await prisma.event.findUnique({ where: { id } })

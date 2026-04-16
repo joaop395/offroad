@@ -6,7 +6,7 @@
 1. Usuário clica "Inscrever-se" → modal em 4 passos
 2. No passo final clica "Pagar agora"
 3. Frontend → POST /api/payments/checkout (eventId, adults, children, name, phone, email)
-4. Backend calcula total, valida vagas, cria Preference no MP
+4. Backend calcula total, valida vagas do evento próprio e cria Preference no MP
 5. Backend retorna { initPoint, preferenceId }
 6. Frontend redireciona para initPoint (checkout hospedado do MP)
 7. Usuário paga (PIX ou cartão) no ambiente do MP
@@ -18,6 +18,8 @@
 10. Backend valida assinatura → consulta status na API do MP → salva Registration
 11. As páginas de retorno exibem o status; somente a de sucesso mostra CTA de WhatsApp
 ```
+
+> O checkout vale somente para eventos próprios (`/api/own-events`). Eventos parceiros são apenas informativos e não entram neste fluxo.
 
 ## Configuração de credenciais
 
@@ -77,6 +79,7 @@ ngrok http 3001
 - Consulta status na API do MP antes de confirmar (não confia só no payload)
 - `mpPaymentId` com constraint UNIQUE — previne processamento duplicado
 - O backend aceita metadados do pagamento em `camelCase` e `snake_case` para manter compatibilidade no webhook
+- O `eventId` do checkout sempre referencia um evento próprio; parceiros ficam fora do escopo de pagamento
 
 ## Variáveis de ambiente necessárias
 

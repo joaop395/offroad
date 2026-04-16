@@ -23,10 +23,24 @@ Evento de trilha gerenciado pelo admin.
 | name | String | Nome do evento |
 | date | DateTime | Data/hora do evento |
 | location | String | Local |
-| difficulty | Difficulty | Enum de dificuldade |
+| classification | Classification | Enum de classificação |
 | priceAdult | Float | Valor por adulto (R$) |
 | priceChild | Float | Valor por criança (R$) |
-| maxSlots | Int | Vagas máximas totais (adultos + crianças) |
+| maxSlots | Int | Vagas máximas totais (adultos + crianças), obrigatório em todas as classificações |
+| createdAt | DateTime | Data de criação |
+| updatedAt | DateTime | Última atualização |
+
+### PartnerEvent
+Evento informativo de terceiros/parceiros. Não participa do fluxo de inscrição nem de pagamento.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Int | PK autoincrement |
+| name | String | Nome do evento |
+| date | DateTime | Data/hora do evento |
+| description | String | Texto descritivo obrigatório |
+| location | String? | Local opcional |
+| bannerUrl | String? | URL pública do banner enviado pelo admin |
 | createdAt | DateTime | Data de criação |
 | updatedAt | DateTime | Última atualização |
 
@@ -54,7 +68,7 @@ Configurações globais do sistema. Sempre 1 registro (id=1).
 | id | Int | PK fixo = 1 |
 | whatsappNumber | String | Número do admin para link wa.me |
 
-## Enum Difficulty
+## Enum Classification
 
 | Valor | Label no card | Cor |
 |---|---|---|
@@ -63,6 +77,7 @@ Configurações globais do sistema. Sempre 1 registro (id=1).
 | MODERADA_AT | Moderada · Pneu AT | #D4682A |
 | MODERADA_MUD | Moderada · Pneu Mud | #E67E22 |
 | AVANCADA | Avançada · Lift | #C0392B |
+| REUNIAO | Reunião | #4C6A92 |
 
 ## Migrations
 
@@ -79,3 +94,4 @@ npm run db:deploy
 - Vagas disponíveis: calculadas em runtime (`maxSlots - SUM(adults + children)`) — nunca cacheadas, sempre consistentes
 - `mpPaymentId` tem constraint UNIQUE — garante idempotência no webhook
 - `onDelete: Cascade` em Registration → ao deletar evento, inscrições são removidas junto
+- `PartnerEvent` é separado de `Event` para não misturar conteúdo informativo com fluxo transacional

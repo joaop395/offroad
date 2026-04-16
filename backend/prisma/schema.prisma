@@ -19,13 +19,24 @@ model Event {
   name          String
   date          DateTime
   location      String
-  difficulty    Difficulty
+  classification Classification
   priceAdult    Float
   priceChild    Float
   maxSlots      Int
   registrations Registration[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+}
+
+model PartnerEvent {
+  id          Int      @id @default(autoincrement())
+  name        String
+  date        DateTime
+  description String
+  location    String?
+  bannerUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Registration {
@@ -47,10 +58,11 @@ model Settings {
   whatsappNumber String @default("")
 }
 
-enum Difficulty {
+enum Classification {
   LEVE_4X4
   LEVE_AT_4X4
   MODERADA_AT
   MODERADA_MUD
   AVANCADA
+  REUNIAO
 }

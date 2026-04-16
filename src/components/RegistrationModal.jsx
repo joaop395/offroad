@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { API_BASE } from '../lib/api'
 
-const DIFF = {
+const CLASSIFICATION = {
   LEVE_4X4:    { label: 'Leve 4x4',           color: '#27AE60' },
   LEVE_AT_4X4: { label: 'Leve · Pneu AT',     color: '#2ECC71' },
   MODERADA_AT: { label: 'Moderada · Pneu AT',  color: '#D4682A' },
   MODERADA_MUD:{ label: 'Moderada · Pneu Mud', color: '#E67E22' },
   AVANCADA:    { label: 'Avançada · Lift',     color: '#C0392B' },
+  REUNIAO:     { label: 'Reunião',             color: '#4C6A92' },
 }
 
 function formatDate(iso) {
@@ -60,7 +61,7 @@ const inputCls = "w-full bg-offblack border border-white/10 text-white font-body
 // ── Modal ──────────────────────────────────────────────────────────────────
 export default function RegistrationModal({ event, onClose }) {
   const available = event.maxSlots - event.slotsUsed
-  const diff = DIFF[event.difficulty] ?? DIFF.LEVE_4X4
+  const classification = CLASSIFICATION[event.classification] ?? CLASSIFICATION.LEVE_4X4
 
   const [step, setStep]       = useState(1) // 1-5
   const [adults, setAdults]   = useState(1)
@@ -120,8 +121,8 @@ export default function RegistrationModal({ event, onClose }) {
       <div>
         <span
           className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase px-3 py-1 mb-3 text-white"
-          style={{ backgroundColor: diff.color }}
-        >{diff.label}</span>
+          style={{ backgroundColor: classification.color }}
+        >{classification.label}</span>
         <h3 className="font-display text-gold text-2xl tracking-wide">{event.name}</h3>
         <p className="font-mono text-white/50 text-xs mt-1">{formatDate(event.date)} · {event.location}</p>
       </div>

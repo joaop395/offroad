@@ -1,35 +1,21 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-
-import Nav     from './components/Nav'
-import Hero    from './components/Hero'
-import About   from './components/About'
-import Gallery from './components/Gallery'
-import Events  from './components/Events'
-import Cta     from './components/Cta'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import AdminLogin    from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import RequireAuth   from './pages/admin/RequireAuth'
+import PublicLayout from './layouts/PublicLayout'
+import EventsPage from './pages/EventsPage'
+import HomePage from './pages/HomePage'
 import SuccessPage   from './pages/SuccessPage'
-
-function PublicSite() {
-  return (
-    <div className="bg-offblack text-white overflow-x-hidden">
-      <Nav />
-      <Hero />
-      <About />
-      <Gallery />
-      <Events />
-      <Cta />
-    </div>
-  )
-}
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PublicSite />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/eventos" element={<EventsPage />} />
+        </Route>
         <Route path="/inscricao/sucesso" element={<SuccessPage />} />
         <Route path="/inscricao/erro" element={<SuccessPage />} />
         <Route path="/inscricao/pendente" element={<SuccessPage />} />

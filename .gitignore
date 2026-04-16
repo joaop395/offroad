@@ -2,12 +2,15 @@ node_modules/
 dist/
 .env
 .env.local
+.codex
 .DS_Store
 *.local
 
 # Backend
 backend/node_modules/
 backend/.env
+backend/start.sh
+backend/uploads/
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
 scrape-figma.mjs

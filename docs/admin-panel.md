@@ -26,14 +26,23 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 
 ## Abas do painel
 
-### Eventos
+### Eventos próprios
 
-- Lista todos os eventos com dificuldade, data, local, preços e vagas
+- Lista todos os eventos com classificação, data, local, preços e vagas
 - **Novo Evento**: abre formulário com campos:
-  - Nome, Data/hora, Local, Dificuldade (select com 5 presets), Vagas máximas, Valor adulto, Valor criança
+  - Nome, Data/hora, Local, Classificação (select com presets), Vagas máximas obrigatórias, Valor adulto, Valor criança
 - **Editar**: reabre o formulário preenchido
 - **Excluir**: confirma antes — remove evento e todas as inscrições (CASCADE)
 - **Inscritos (N)**: abre lista de inscrições do evento
+
+### Eventos parceiros
+
+- Lista todos os eventos parceiros com data, resumo do texto e indicador de banner
+- **Novo Parceiro**: abre formulário com campos:
+  - Nome, Data/hora, Texto obrigatório, Local opcional, Banner opcional
+- **Editar**: reabre o formulário preenchido, com preview do banner atual
+- **Excluir**: remove o registro e o banner associado, se existir
+- Parceiros **não** exibem botão de inscritos e **não** participam do checkout
 
 ### Inscritos por evento
 
@@ -45,7 +54,7 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - Campo: **Número WhatsApp do admin** (formato: `5511999990000`)
 - Usado para montar o link `wa.me` apenas na página de sucesso pós-pagamento
 
-## Presets de dificuldade
+## Presets de classificação
 
 | Valor interno | Label exibido | Cor |
 |---|---|---|
@@ -54,3 +63,11 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 | MODERADA_AT | Moderada · Pneu AT | Laranja #D4682A |
 | MODERADA_MUD | Moderada · Pneu Mud | Laranja escuro #E67E22 |
 | AVANCADA | Avançada · Lift | Vermelho #C0392B |
+| REUNIAO | Reunião | Azul #4C6A92 |
+
+## Regras de domínio
+
+- Eventos próprios usam a rota canônica `/api/own-events`
+- Eventos parceiros usam `/api/partner-events`
+- O calendário público mistura os dois tipos via `/api/calendar-events`
+- Somente eventos próprios aceitam inscrições e pagamentos pelo site

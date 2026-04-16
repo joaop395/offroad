@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 
+import { API_PATHS } from '../../lib/api'
+
 function formatDate(iso) {
   return new Date(iso).toLocaleString('pt-BR')
 }
@@ -9,7 +11,7 @@ export default function RegistrationsList({ eventId, eventName, apiFetch, onBack
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    apiFetch(`/api/events/${eventId}/registrations`)
+    apiFetch(`${API_PATHS.ownEvents}/${eventId}/registrations`)
       .then(r => r.json())
       .then(setRegistrations)
       .finally(() => setLoading(false))

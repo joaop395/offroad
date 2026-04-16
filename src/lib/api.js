@@ -15,17 +15,12 @@ function resolveConfiguredApiBase() {
   try {
     const url = new URL(configured)
     const currentHost = window.location.hostname
-    const currentPort = window.location.port
 
     // Se o build ficou com localhost, mas a app abriu por IP/domínio,
     // em ambiente público preferimos mesma origem e deixamos o nginx
     // encaminhar /api internamente para a 3001.
     if (!LOOPBACK_HOSTS.has(currentHost) && LOOPBACK_HOSTS.has(url.hostname)) {
-      if (currentPort && currentPort !== '5173') {
-        return trimTrailingSlash(window.location.origin)
-      }
-
-      url.hostname = currentHost
+      return trimTrailingSlash(window.location.origin)
     }
 
     return trimTrailingSlash(url.toString())
@@ -39,8 +34,28 @@ function resolveRuntimeApiBase() {
     return 'http://localhost:3001'
   }
 
+  if (!LOOPBACK_HOSTS.has(window.location.hostname)) {
+    return trimTrailingSlash(window.location.origin)
+  }
+
   const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:'
   return `${protocol}//${window.location.hostname}:3001`
 }
 
 export const API_BASE = resolveConfiguredApiBase() ?? resolveRuntimeApiBase()
+export const API_PATHS = {
+  ownEvents: '/api/own-events',
+  legacyEvents: '/api/events',
+  partnerEvents: '/api/partner-events',
+  calendarEvents: '/api/calendar-events',
+}
+
+export function resolveApiAssetUrl(path) {
+  if (!path) return null
+
+  try {
+    return new URL(path, `${API_BASE}/`).toString()
+  } catch {
+    return path
+  }
+}
