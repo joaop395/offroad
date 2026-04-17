@@ -21,14 +21,19 @@ export default function Hero() {
       id="home"
       className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-6 pb-24"
     >
-      {/* Background image from Figma */}
-      <img
-        src="https://images.unsplash.com/photo-1773522918526-19adcbba988d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920"
-        alt="Jeep off-road adventure"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      {/* Background video */}
+      <video autoPlay loop muted playsInline className="absolute inset-0 h-full w-full scale-105 object-cover blur-[3px]">
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-offblack/75" />
+      <div className="absolute inset-0 bg-offblack/78" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 50% 42%, rgba(201,162,39,0.08) 0%, transparent 26%), linear-gradient(180deg, rgba(10,10,10,0.26) 0%, rgba(10,10,10,0.34) 28%, rgba(10,10,10,0.72) 100%)',
+        }}
+      />
 
       {/* Static top accent line */}
       <div className="absolute top-[72px] left-0 right-0 h-px bg-green-500/50 z-10" />

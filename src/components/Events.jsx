@@ -45,16 +45,22 @@ export default function Events() {
 
   return (
     <section id="eventos" className="relative py-28 overflow-hidden">
-      {/* Vídeo de fundo */}
-      <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
+      {/* Imagem de fundo */}
+      <img
+        src="https://images.unsplash.com/photo-1773522918526-19adcbba988d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920"
+        alt="Jeep off-road adventure"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-offblack/70" />
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse at 50% 50%, rgba(74,92,40,0.55) 0%, transparent 70%)'
-      }} />
+      <div className="absolute inset-0 bg-offblack/76" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at 50% 50%, rgba(74,92,40,0.42) 0%, transparent 70%), linear-gradient(180deg, rgba(6,6,6,0.2) 0%, rgba(6,6,6,0.38) 34%, rgba(6,6,6,0.62) 100%)',
+        }}
+      />
 
       {/* Listras diagonais */}
       <div className="absolute top-8 -left-10 w-72 h-px bg-white/10 rotate-[-11deg]" />
