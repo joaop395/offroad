@@ -97,6 +97,7 @@ app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
 app.use(express.json())
 app.use(cookieParser())
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')))
+app.use('/api/uploads', express.static(path.join(__dirname, '..', 'uploads')))
 
 // ── Rotas ──────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes)

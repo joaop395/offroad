@@ -71,3 +71,4 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - Eventos parceiros usam `/api/partner-events`
 - O calendário público mistura os dois tipos via `/api/calendar-events`
 - Somente eventos próprios aceitam inscrições e pagamentos pelo site
+- `Atolado do Mês` não é gerenciado pelo painel na versão atual; a página usa mídia pública estática

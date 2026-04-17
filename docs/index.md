@@ -10,6 +10,8 @@ Este diretório centraliza as especificações funcionais e técnicas do projeto
   Estrutura do banco, entidades, relacionamentos e enums do sistema.
 - [API - Eventos](./api-events.md)  
   Contratos das rotas públicas e protegidas relacionadas a eventos e inscrições.
+- [Experiência Pública](./public-experience.md)  
+  Rotas públicas, navbar compartilhada, home, calendário de eventos e a experiência teatral de Atolado do Mês.
 - [Autenticação](./auth.md)  
   Fluxo JWT, refresh token, endpoints de sessão e medidas de segurança do login.
 - [Pagamentos - Mercado Pago](./payments.md)  
@@ -24,6 +26,7 @@ Este diretório centraliza as especificações funcionais e técnicas do projeto
 - `backend-setup.md`: onboarding técnico
 - `data-model.md`: referência de persistência
 - `api-events.md`: contrato de API
+- `public-experience.md`: rotas e UX pública
 - `auth.md`: spec de autenticação
 - `payments.md`: spec de pagamentos
 - `admin-panel.md`: spec de backoffice
@@ -34,5 +37,6 @@ Este diretório centraliza as especificações funcionais e técnicas do projeto
 - Eventos próprios: `/api/own-events`
 - Eventos parceiros: `/api/partner-events`
 - Calendário público unificado: `/api/calendar-events`
+- Rotas públicas do frontend: `/`, `/eventos`, `/atolado-do-mes`
 - Enum canônico de eventos próprios: `classification`
 - Alias legado mantido: `/api/events`

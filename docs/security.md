@@ -53,6 +53,8 @@
 | Token em sessionStorage | ✅ | Some ao fechar aba |
 | Auto-refresh transparente | ✅ | Renova token sem logout forçado |
 | Separação de domínios na UI | ✅ | Parceiros não exibem CTA de inscrição |
+| Áudio iniciado por gesto do usuário | ✅ | `Atolado do Mês` só arma/reproduz mídia após clique explícito |
+| Assets públicos normalizados | ✅ | Foto e MP3 de `Atolado do Mês` vivem em `public/media/atolado-do-mes` |
 
 ## Variáveis de ambiente
 
@@ -74,3 +76,4 @@
 - [ ] Garantir HTTPS no backend (necessário para cookie Secure)
 - [ ] Verificar que `backend/.env` e `prisma/dev.db` não estão no repositório
 - [ ] Garantir persistência/backup de `backend/uploads/partner-events` em produção
+- [ ] Confirmar que `public/media/atolado-do-mes` está presente no deploy de produção

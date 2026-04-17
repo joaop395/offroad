@@ -72,6 +72,12 @@ GET /api/own-events/1/registrations
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
+## Rotas públicas sem autenticação
+
+- `/`
+- `/eventos`
+- `/atolado-do-mes`
+
 ## Testando com curl
 
 ```bash

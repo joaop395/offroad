@@ -19,7 +19,7 @@
 11. As páginas de retorno exibem o status; somente a de sucesso mostra CTA de WhatsApp
 ```
 
-> O checkout vale somente para eventos próprios (`/api/own-events`). Eventos parceiros são apenas informativos e não entram neste fluxo.
+> O checkout vale somente para eventos próprios (`/api/own-events`). Eventos parceiros são apenas informativos e não entram neste fluxo. A rota `/atolado-do-mes` também fica totalmente fora do checkout.
 
 ## Configuração de credenciais
 

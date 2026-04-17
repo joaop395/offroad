@@ -95,3 +95,4 @@ npm run db:deploy
 - `mpPaymentId` tem constraint UNIQUE — garante idempotência no webhook
 - `onDelete: Cascade` em Registration → ao deletar evento, inscrições são removidas junto
 - `PartnerEvent` é separado de `Event` para não misturar conteúdo informativo com fluxo transacional
+- `Atolado do Mês` atualmente não usa tabela própria; a experiência é montada com assets estáticos públicos no frontend

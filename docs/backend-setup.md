@@ -98,3 +98,4 @@ npm run dev
 - A rota canônica de eventos próprios é `/api/own-events`
 - `/api/events` permanece apenas como alias legado de compatibilidade
 - Eventos parceiros têm CRUD separado e não entram no fluxo de inscrição/pagamento
+- A rota pública `/atolado-do-mes` é frontend-only e usa assets estáticos em `public/media/atolado-do-mes`

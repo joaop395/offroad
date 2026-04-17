@@ -53,9 +53,11 @@ export const API_PATHS = {
 export function resolveApiAssetUrl(path) {
   if (!path) return null
 
+  const normalizedPath = path.startsWith('/uploads/') ? `/api${path}` : path
+
   try {
-    return new URL(path, `${API_BASE}/`).toString()
+    return new URL(normalizedPath, `${API_BASE}/`).toString()
   } catch {
-    return path
+    return normalizedPath
   }
 }

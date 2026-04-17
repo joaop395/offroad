@@ -2,6 +2,8 @@
 
 Base URL: `http://localhost:3001`
 
+> Observação: a página pública `/atolado-do-mes` não consome API própria nesta fase; ela é uma experiência frontend com assets estáticos.
+
 ## Rotas públicas
 
 ### GET /api/calendar-events
