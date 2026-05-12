@@ -1,8 +1,15 @@
 import { Router } from 'express'
+import multer from 'multer'
 import { z } from 'zod'
 import prisma from '../lib/prisma.js'
 import { requireAuth } from '../middleware/auth.js'
 import { slotsUsed, withSlots } from '../lib/calendarEvents.js'
+import {
+  accountabilityImageUpload,
+  buildAccountabilityImageUrl,
+  removeAccountabilityImageByUrl,
+  removeUploadedFileByPath,
+} from '../lib/accountabilityUploads.js'
 
 const router = Router()
 
@@ -18,7 +25,44 @@ const ownEventSchema = z.object({
   priceAdult: z.number().nonnegative('Valor adulto não pode ser negativo.'),
   priceChild: z.number().nonnegative('Valor criança não pode ser negativo.'),
   maxSlots: z.number().int('Vagas devem ser um número inteiro.').positive('Vagas são obrigatórias e devem ser maiores que zero.'),
+  removeAccountabilityImage: z.boolean(),
 }).strict()
+
+function normalizeOwnEventBody(body) {
+  return {
+    name: String(body?.name ?? ''),
+    date: String(body?.date ?? ''),
+    location: String(body?.location ?? ''),
+    classification: String(body?.classification ?? ''),
+    priceAdult: Number(body?.priceAdult),
+    priceChild: Number(body?.priceChild),
+    maxSlots: Number(body?.maxSlots),
+    removeAccountabilityImage: String(body?.removeAccountabilityImage ?? '').toLowerCase() === 'true',
+  }
+}
+
+function parseAccountabilityUpload(req, res) {
+  return new Promise((resolve, reject) => {
+    accountabilityImageUpload.single('accountabilityImage')(req, res, (error) => {
+      if (error) reject(error)
+      else resolve()
+    })
+  })
+}
+
+function handleUploadError(error, res) {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      res.status(400).json({ error: 'Print da prestação deve ter no máximo 5MB.' })
+      return true
+    }
+
+    res.status(400).json({ error: 'Print da prestação inválido. Envie uma imagem compatível.' })
+    return true
+  }
+
+  return false
+}
 
 // GET /api/own-events — público
 router.get('/', async (_req, res) => {
@@ -53,27 +97,72 @@ router.get('/:id/registrations', requireAuth, async (req, res) => {
 
 // POST /api/own-events — admin
 router.post('/', requireAuth, async (req, res) => {
-  const result = ownEventSchema.safeParse(req.body)
+  try {
+    await parseAccountabilityUpload(req, res)
+  } catch (error) {
+    if (handleUploadError(error, res)) return
+    throw error
+  }
+
+  const result = ownEventSchema.safeParse(normalizeOwnEventBody(req.body))
   if (!result.success) {
+    await removeUploadedFileByPath(req.file?.path)
     return res.status(400).json({ error: result.error.flatten() })
   }
 
-  const event = await prisma.event.create({ data: result.data })
+  const { removeAccountabilityImage: _removeAccountabilityImage, ...eventData } = result.data
+  const accountabilityImageUrl = req.file ? buildAccountabilityImageUrl(req.file.filename) : null
+  const event = await prisma.event.create({
+    data: {
+      ...eventData,
+      date: new Date(eventData.date),
+      accountabilityImageUrl,
+    },
+  })
   res.status(201).json(event)
 })
 
 // PUT /api/own-events/:id — admin
 router.put('/:id', requireAuth, async (req, res) => {
   const id = Number(req.params.id)
-  const result = ownEventSchema.safeParse(req.body)
-  if (!result.success) {
-    return res.status(400).json({ error: result.error.flatten() })
-  }
-
   const existing = await prisma.event.findUnique({ where: { id } })
   if (!existing) return res.status(404).json({ error: 'Evento não encontrado.' })
 
-  const event = await prisma.event.update({ where: { id }, data: result.data })
+  try {
+    await parseAccountabilityUpload(req, res)
+  } catch (error) {
+    if (handleUploadError(error, res)) return
+    throw error
+  }
+
+  const result = ownEventSchema.safeParse(normalizeOwnEventBody(req.body))
+  if (!result.success) {
+    await removeUploadedFileByPath(req.file?.path)
+    return res.status(400).json({ error: result.error.flatten() })
+  }
+
+  const { removeAccountabilityImage, ...eventData } = result.data
+  const nextAccountabilityImageUrl = req.file
+    ? buildAccountabilityImageUrl(req.file.filename)
+    : removeAccountabilityImage
+      ? null
+      : existing.accountabilityImageUrl
+
+  const event = await prisma.event.update({
+    where: { id },
+    data: {
+      ...eventData,
+      date: new Date(eventData.date),
+      accountabilityImageUrl: nextAccountabilityImageUrl,
+    },
+  })
+
+  if (req.file && existing.accountabilityImageUrl) {
+    await removeAccountabilityImageByUrl(existing.accountabilityImageUrl)
+  } else if (!req.file && removeAccountabilityImage && existing.accountabilityImageUrl) {
+    await removeAccountabilityImageByUrl(existing.accountabilityImageUrl)
+  }
+
   res.json(event)
 })
 
@@ -84,6 +173,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Evento não encontrado.' })
 
   await prisma.event.delete({ where: { id } })
+  await removeAccountabilityImageByUrl(existing.accountabilityImageUrl)
   res.json({ ok: true })
 })
 

@@ -23,6 +23,7 @@ model Event {
   priceAdult    Float
   priceChild    Float
   maxSlots      Int
+  accountabilityImageUrl String?
   registrations Registration[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -56,6 +57,23 @@ model Registration {
 model Settings {
   id             Int    @id @default(1)
   whatsappNumber String @default("")
+}
+
+model Sponsor {
+  id         Int      @id @default(autoincrement())
+  filename   String
+  name       String
+  url        String?
+  order      Int      @default(0)
+  uploadedAt DateTime @default(now())
+}
+
+model GalleryImage {
+  id         Int      @id @default(autoincrement())
+  filename   String
+  label      String
+  order      Int      @default(0)
+  uploadedAt DateTime @default(now())
 }
 
 enum Classification {

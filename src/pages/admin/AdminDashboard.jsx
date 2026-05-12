@@ -7,6 +7,8 @@ import EventForm from './EventForm'
 import PartnerEventForm from './PartnerEventForm'
 import RegistrationsList from './RegistrationsList'
 import AdminSettings from './AdminSettings'
+import GalleryUpload from './GalleryUpload'
+import SponsorUpload from './SponsorUpload'
 
 const CLASSIFICATION_LABELS = {
   LEVE_4X4:    { label: 'Leve 4x4',          color: '#27AE60' },
@@ -28,7 +30,7 @@ export default function AdminDashboard() {
   const { apiFetch } = useApi()
   const navigate = useNavigate()
 
-  const [tab, setTab]           = useState('own-events') // 'own-events' | 'partner-events' | 'settings'
+  const [tab, setTab]           = useState('own-events') // 'own-events' | 'partner-events' | 'gallery' | 'settings'
   const [events, setEvents]     = useState([])
   const [loading, setLoading]   = useState(true)
   const [formOpen, setFormOpen] = useState(false)
@@ -38,6 +40,10 @@ export default function AdminDashboard() {
   const [partnerLoading, setPartnerLoading] = useState(true)
   const [partnerFormOpen, setPartnerFormOpen] = useState(false)
   const [editingPartner, setEditingPartner] = useState(null)
+  const [galleryImages, setGalleryImages] = useState([])
+  const [galleryLoading, setGalleryLoading] = useState(true)
+  const [sponsors, setSponsors] = useState([])
+  const [sponsorsLoading, setSponsorsLoading] = useState(true)
 
   const fetchEvents = useCallback(async () => {
     setLoading(true)
@@ -61,8 +67,32 @@ export default function AdminDashboard() {
     }
   }, [apiFetch])
 
+  const fetchGallery = useCallback(async () => {
+    setGalleryLoading(true)
+    try {
+      const res = await apiFetch(API_PATHS.gallery)
+      const data = await res.json()
+      setGalleryImages(data)
+    } finally {
+      setGalleryLoading(false)
+    }
+  }, [apiFetch])
+
+  const fetchSponsors = useCallback(async () => {
+    setSponsorsLoading(true)
+    try {
+      const res = await apiFetch(API_PATHS.sponsors)
+      const data = await res.json()
+      setSponsors(data)
+    } finally {
+      setSponsorsLoading(false)
+    }
+  }, [apiFetch])
+
   useEffect(() => { fetchEvents() }, [fetchEvents])
   useEffect(() => { fetchPartnerEvents() }, [fetchPartnerEvents])
+  useEffect(() => { fetchGallery() }, [fetchGallery])
+  useEffect(() => { fetchSponsors() }, [fetchSponsors])
 
   async function handleDelete(id) {
     if (!confirm('Tem certeza que deseja excluir este evento? As inscrições também serão removidas.')) return
@@ -100,8 +130,8 @@ export default function AdminDashboard() {
       </header>
 
       {/* Tabs */}
-      <nav className="relative z-10 border-b border-white/10 px-6 flex gap-6">
-        {[['own-events', 'Eventos próprios'], ['partner-events', 'Eventos parceiros'], ['settings', 'Configurações']].map(([key, label]) => (
+      <nav className="relative z-10 border-b border-white/10 px-6 flex gap-6 overflow-x-auto">
+        {[['own-events', 'Eventos próprios'], ['partner-events', 'Eventos parceiros'], ['gallery', 'Galeria'], ['sponsors', 'Patrocinadores'], ['settings', 'Configurações']].map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -118,6 +148,22 @@ export default function AdminDashboard() {
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-8">
         {tab === 'settings' && <AdminSettings apiFetch={apiFetch} />}
+
+        {tab === 'gallery' && (
+          <GalleryUpload
+            images={galleryImages}
+            apiFetch={apiFetch}
+            onRefresh={fetchGallery}
+          />
+        )}
+
+        {tab === 'sponsors' && (
+          <SponsorUpload
+            sponsors={sponsors}
+            apiFetch={apiFetch}
+            onRefresh={fetchSponsors}
+          />
+        )}
 
         {tab === 'own-events' && (
           <>
@@ -181,6 +227,11 @@ export default function AdminDashboard() {
                             >
                               {classification.label}
                             </span>
+                            {ev.accountabilityImageUrl && (
+                              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/68">
+                                Com prestação
+                              </span>
+                            )}
                           </div>
                           <h3 className="font-display text-gold text-xl tracking-wide">{ev.name}</h3>
                           <p className="font-mono text-white/50 text-xs mt-1">

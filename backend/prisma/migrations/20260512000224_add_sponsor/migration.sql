@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "Sponsor" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "filename" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "url" TEXT,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

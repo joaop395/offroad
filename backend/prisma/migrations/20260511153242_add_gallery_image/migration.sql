@@ -1,0 +1,8 @@
+-- CreateTable
+CREATE TABLE "GalleryImage" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "filename" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "order" INTEGER NOT NULL DEFAULT 0,
+    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

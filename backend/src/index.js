@@ -12,7 +12,12 @@ import eventsRoutes from './routes/events.js'
 import partnerEventsRoutes from './routes/partner-events.js'
 import paymentsRoutes from './routes/payments.js'
 import settingsRoutes from './routes/settings.js'
+import galleryRoutes from './routes/gallery.js'
+import sponsorRoutes from './routes/sponsors.js'
+import { ensureAccountabilityUploadsReady } from './lib/accountabilityUploads.js'
 import { ensureUploadsReady } from './lib/partnerEventUploads.js'
+import { ensureGalleryUploadsReady } from './lib/galleryUploads.js'
+import { ensureSponsorUploadsReady } from './lib/sponsorUploads.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -107,6 +112,8 @@ app.use('/api/events', eventsRoutes)
 app.use('/api/partner-events', partnerEventsRoutes)
 app.use('/api/payments', paymentsRoutes)
 app.use('/api/settings', settingsRoutes)
+app.use('/api/gallery', galleryRoutes)
+app.use('/api/sponsors', sponsorRoutes)
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
@@ -116,7 +123,12 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Erro interno do servidor.' })
 })
 
-ensureUploadsReady()
+Promise.all([
+  ensureUploadsReady(),
+  ensureAccountabilityUploadsReady(),
+  ensureGalleryUploadsReady(),
+  ensureSponsorUploadsReady(),
+])
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Backend rodando na porta ${PORT}`)

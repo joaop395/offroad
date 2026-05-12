@@ -48,6 +48,8 @@ export const API_PATHS = {
   legacyEvents: '/api/events',
   partnerEvents: '/api/partner-events',
   calendarEvents: '/api/calendar-events',
+  gallery: '/api/gallery',
+  sponsors: '/api/sponsors',
 }
 
 export function resolveApiAssetUrl(path) {

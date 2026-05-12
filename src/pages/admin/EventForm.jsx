@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { API_PATHS } from '../../lib/api'
+import { API_PATHS, resolveApiAssetUrl } from '../../lib/api'
 
 const CLASSIFICATIONS = [
   { value: 'LEVE_4X4',     label: 'Leve 4x4' },
@@ -30,8 +30,25 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
     priceChild: initial?.priceChild ?? '',
     maxSlots:   initial?.maxSlots ?? '',
   })
+  const [accountabilityFile, setAccountabilityFile] = useState(null)
+  const [removeAccountabilityImage, setRemoveAccountabilityImage] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState(null)
   const [error, setError]   = useState('')
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (!accountabilityFile) {
+      setPreviewUrl(null)
+      return undefined
+    }
+
+    const objectUrl = URL.createObjectURL(accountabilityFile)
+    setPreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [accountabilityFile])
 
   function set(field, value) {
     setForm(f => ({ ...f, [field]: value }))
@@ -55,16 +72,21 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
     setError('')
     setSaving(true)
     try {
-      const body = {
-        ...form,
-        date:       new Date(form.date).toISOString(),
-        priceAdult: Number(form.priceAdult),
-        priceChild: Number(form.priceChild),
-        maxSlots:   Number(form.maxSlots),
-      }
+      const body = new FormData()
+      body.append('name', form.name)
+      body.append('date', new Date(form.date).toISOString())
+      body.append('location', form.location)
+      body.append('classification', form.classification)
+      body.append('priceAdult', String(Number(form.priceAdult)))
+      body.append('priceChild', String(Number(form.priceChild)))
+      body.append('maxSlots', String(Number(form.maxSlots)))
+      body.append('removeAccountabilityImage', removeAccountabilityImage ? 'true' : 'false')
+
+      if (accountabilityFile) body.append('accountabilityImage', accountabilityFile)
+
       const url    = isEditing ? `${API_PATHS.ownEvents}/${initial.id}` : API_PATHS.ownEvents
       const method = isEditing ? 'PUT' : 'POST'
-      const res    = await apiFetch(url, { method, body: JSON.stringify(body) })
+      const res    = await apiFetch(url, { method, body })
       const data   = await res.json()
       if (!res.ok) throw new Error(extractErrorMessage(data.error))
       onSave()
@@ -77,6 +99,7 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
 
   const inputCls = "w-full bg-offblack border border-white/10 text-white font-body text-sm px-3 py-2.5 focus:outline-none focus:border-gold/60 transition-colors"
   const labelCls = "font-mono text-[11px] tracking-widest text-white/50 uppercase block mb-1.5"
+  const currentAccountabilityImage = previewUrl || (removeAccountabilityImage ? null : resolveApiAssetUrl(initial?.accountabilityImageUrl))
 
   return (
     <div className="mb-8">
@@ -130,6 +153,44 @@ export default function EventForm({ initial, apiFetch, onSave, onCancel }) {
           <div>
             <label className={labelCls}>Valor criança (R$)</label>
             <input type="number" value={form.priceChild} onChange={e => set('priceChild', e.target.value)} required min={0} step="0.01" className={inputCls} />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className={labelCls}>Print da prestação de contas</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? null
+                setAccountabilityFile(file)
+                if (file) setRemoveAccountabilityImage(false)
+              }}
+              className={inputCls}
+            />
+
+            {currentAccountabilityImage && (
+              <div className="mt-4 border border-white/10 bg-offblack/30 p-3">
+                <img
+                  src={currentAccountabilityImage}
+                  alt="Preview da prestação de contas"
+                  className="max-h-72 w-full object-contain"
+                />
+              </div>
+            )}
+
+            {isEditing && initial?.accountabilityImageUrl && (
+              <label className="mt-3 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.24em] text-white/45">
+                <input
+                  type="checkbox"
+                  checked={removeAccountabilityImage}
+                  onChange={(e) => {
+                    setRemoveAccountabilityImage(e.target.checked)
+                    if (e.target.checked) setAccountabilityFile(null)
+                  }}
+                />
+                Remover print atual
+              </label>
+            )}
           </div>
         </div>
 

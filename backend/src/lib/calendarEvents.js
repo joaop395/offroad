@@ -32,6 +32,7 @@ export async function buildOwnCalendarItem(event) {
     priceAdult: event.priceAdult,
     priceChild: event.priceChild,
     maxSlots: event.maxSlots,
+    accountabilityImageUrl: event.accountabilityImageUrl,
     slotsUsed: used,
     availableSlots: event.maxSlots - used,
   }

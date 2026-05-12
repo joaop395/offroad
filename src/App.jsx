@@ -8,6 +8,7 @@ import AtoladoPage from './pages/AtoladoPage'
 import EventsPage from './pages/EventsPage'
 import HomePage from './pages/HomePage'
 import SuccessPage   from './pages/SuccessPage'
+import TransparencyPage from './pages/TransparencyPage'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/eventos" element={<EventsPage />} />
           <Route path="/atolado-do-mes" element={<AtoladoPage />} />
+          <Route path="/prestacao-de-contas" element={<TransparencyPage />} />
         </Route>
         <Route path="/inscricao/sucesso" element={<SuccessPage />} />
         <Route path="/inscricao/erro" element={<SuccessPage />} />

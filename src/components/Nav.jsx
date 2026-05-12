@@ -24,6 +24,7 @@ export default function Nav() {
     { label: 'Galeria', to: '/#galeria', active: location.pathname === '/' && location.hash === '#galeria' },
     { label: 'Eventos', to: '/eventos', active: location.pathname === '/eventos' },
     { label: 'Atolado do Mês', to: '/atolado-do-mes', active: location.pathname === '/atolado-do-mes' },
+    { label: 'Prestação de Contas', to: '/prestacao-de-contas', active: location.pathname === '/prestacao-de-contas' },
   ]
 
   const solidNav = scrolled || location.pathname !== '/'
@@ -55,12 +56,12 @@ export default function Nav() {
       </Link>
 
       {/* Links */}
-      <ul className="flex items-center gap-5 lg:gap-7 list-none">
+      <ul className="flex items-center gap-4 lg:gap-6 list-none">
         {navItems.map(({ label, to, active }) => (
           <li key={label} className="hidden md:block">
             <Link
               to={to}
-              className={`whitespace-nowrap font-body font-semibold text-[12px] lg:text-[13px] tracking-[0.22em] lg:tracking-[0.25em] uppercase transition-colors duration-200 relative group ${
+              className={`whitespace-nowrap font-body font-semibold text-[11px] lg:text-[12px] tracking-[0.18em] lg:tracking-[0.22em] uppercase transition-colors duration-200 relative group ${
                 active ? 'text-gold' : 'text-white/80 hover:text-gold'
               }`}
               aria-current={active ? 'page' : undefined}

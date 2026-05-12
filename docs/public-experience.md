@@ -7,6 +7,7 @@
 | `/` | Landing principal com Hero, Sobre, Galeria, Próximos Rolês e CTA |
 | `/eventos` | Calendário mensal público com eventos próprios e parceiros |
 | `/atolado-do-mes` | Experiência teatral com cortinas, countdown, áudio e foto emoldurada |
+| `/prestacao-de-contas` | Lista pública de prestações de contas de eventos próprios já realizados |
 
 ## Navbar compartilhada
 
@@ -16,6 +17,7 @@
   - `Galeria` → `/#galeria`
   - `Eventos` → `/eventos`
   - `Atolado do Mês` → `/atolado-do-mes`
+  - `Prestação de Contas` → `/prestacao-de-contas`
   - `Insta` → link externo
 - Em rotas diferentes de `/`, a navbar fica sólida com blur e borda inferior
 
@@ -52,3 +54,11 @@
   - início do MP3 no mesmo instante da revelação da foto
 - A foto aparece em moldura dourada/cinematográfica, centralizada
 - Não há fallback de mídia nem dependência administrativa na versão atual
+
+## Prestação de Contas (`/prestacao-de-contas`)
+
+- Consome `GET /api/calendar-events`
+- Exibe somente eventos próprios (`kind: own`) já realizados
+- Eventos parceiros nunca aparecem nessa página
+- Eventos próprios sem `accountabilityImageUrl` ficam ocultos
+- Cada item abre um container expansível com o print completo da prestação de contas
