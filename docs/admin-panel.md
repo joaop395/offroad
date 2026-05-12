@@ -49,6 +49,20 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - Tabela com: nome, telefone, e-mail, adultos, crianças, total pago, data do pagamento, ID MP
 - Botão **Exportar CSV** gera arquivo para download
 
+### Galeria
+
+- Lista as fotos em grid com miniaturas
+- **Adicionar**: upload de imagem (PNG/JPG, max 5MB) + label
+- **Reordenar**: botões ↑↓ trocam a posição
+- **Excluir**: remove do banco e deleta o arquivo
+
+### Patrocinadores
+
+- Lista os logos em grid com miniaturas
+- **Adicionar**: upload de imagem + nome + link opcional
+- **Reordenar**: botões ↑↓ trocam a posição
+- **Excluir**: remove do banco e deleta o arquivo
+
 ### Configurações
 
 - Campo: **Número WhatsApp do admin** (formato: `5511999990000`)
@@ -72,3 +86,5 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - O calendário público mistura os dois tipos via `/api/calendar-events`
 - Somente eventos próprios aceitam inscrições e pagamentos pelo site
 - `Atolado do Mês` não é gerenciado pelo painel na versão atual; a página usa mídia pública estática
+- Galeria e Patrocinadores seguem o mesmo padrão de CRUD: multer + Prisma + `/uploads/` servido via `/api/uploads/`
+- A seção pública de cada recurso só renderiza se houver dados — se vazia ou backend off, some graciosamente

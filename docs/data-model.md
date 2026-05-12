@@ -60,6 +60,29 @@ Inscrição confirmada após pagamento aprovado pelo Mercado Pago.
 | mpPaymentId | String (unique) | ID do pagamento no Mercado Pago |
 | paidAt | DateTime | Data/hora do pagamento |
 
+### GalleryImage
+Foto enviada pelo admin para a galeria da home. Exibida em grid 2x2 (mobile) / 3x3 (desktop) com lightbox ao clicar.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Int | PK autoincrement |
+| filename | String | Nome do arquivo em `/uploads/gallery/` |
+| label | String | Legenda exibida no hover |
+| order | Int | Ordem de exibição (ascendente) |
+| uploadedAt | DateTime | Data de upload |
+
+### Sponsor
+Logo de patrocinador/apoiador. Exibido entre Galeria e Eventos na home. Logos em grayscale, ganham cor e escala no hover.
+
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Int | PK autoincrement |
+| filename | String | Nome do arquivo em `/uploads/sponsors/` |
+| name | String | Nome do patrocinador |
+| url | String? | Link opcional (abre em nova aba) |
+| order | Int | Ordem de exibição (ascendente) |
+| uploadedAt | DateTime | Data de upload |
+
 ### Settings
 Configurações globais do sistema. Sempre 1 registro (id=1).
 
@@ -96,3 +119,5 @@ npm run db:deploy
 - `onDelete: Cascade` em Registration → ao deletar evento, inscrições são removidas junto
 - `PartnerEvent` é separado de `Event` para não misturar conteúdo informativo com fluxo transacional
 - `Atolado do Mês` atualmente não usa tabela própria; a experiência é montada com assets estáticos públicos no frontend
+- `GalleryImage` e `Sponsor` seguem o mesmo padrão de upload com multer + resolução de URL via `resolveApiAssetUrl()`
+- Uploads de galeria e sponsors ficam em `uploads/gallery/` e `uploads/sponsors/`, servidos estaticamente via `/api/uploads/`

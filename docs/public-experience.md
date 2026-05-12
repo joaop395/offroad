@@ -23,6 +23,22 @@
 
 ## Home (`/`)
 
+### Galeria
+
+- Seção "Nossas Aventuras" entre o Sobre e a seção de apoiadores
+- Consome `GET /api/gallery` — ordenado por `order`
+- Grid 2 colunas (mobile) / 3 colunas (desktop)
+- Ao clicar, abre lightbox fullscreen com overlay escuro e legenda
+- Se não houver imagens ou a API falhar, a seção **não renderiza**
+
+### Apoiadores
+
+- Seção "Quem Apoia o Rolé" entre a Galeria e os Eventos
+- Consome `GET /api/sponsors` — ordenado por `order`
+- Logos em grayscale com opacidade 40%; no hover: cor total + escala 110%
+- Cada logo pode ter link externo (abre em nova aba)
+- Se não houver patrocinadores ou a API falhar, a seção **não renderiza**
+
 ### Próximos Rolês
 
 - Consome o feed unificado de `GET /api/calendar-events`

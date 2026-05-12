@@ -11,20 +11,28 @@ backend/
 ├── src/
 │   ├── index.js          ← servidor Express (entry point)
 │   ├── lib/
-│   │   └── prisma.js     ← cliente Prisma singleton
-│   │   ├── calendarEvents.js      ← normalização pública do calendário
-│   │   └── partnerEventUploads.js ← upload/local path de banners
+│   │   ├── prisma.js     ← cliente Prisma singleton
+│   │   ├── calendarEvents.js         ← normalização pública do calendário
+│   │   ├── partnerEventUploads.js    ← upload/local path de banners
+│   │   ├── accountabilityUploads.js  ← upload de imagens de prestação de contas
+│   │   ├── galleryUploads.js         ← upload de fotos da galeria
+│   │   └── sponsorUploads.js         ← upload de logos de patrocinadores
 │   ├── middleware/
 │   │   └── auth.js       ← JWT verify middleware
 │   └── routes/
-│       ├── auth.js       ← /api/auth/*
-│       ├── events.js     ← /api/own-events/* (alias legado: /api/events/*)
-│       ├── calendar-events.js ← /api/calendar-events
-│       ├── partner-events.js  ← /api/partner-events/*
-│       ├── payments.js   ← /api/payments/*
-│       └── settings.js   ← /api/settings
+│       ├── auth.js           ← /api/auth/*
+│       ├── events.js         ← /api/own-events/* (alias legado: /api/events/*)
+│       ├── calendar-events.js← /api/calendar-events
+│       ├── partner-events.js ← /api/partner-events/*
+│       ├── payments.js       ← /api/payments/*
+│       ├── settings.js       ← /api/settings
+│       ├── gallery.js        ← /api/gallery/*
+│       └── sponsors.js       ← /api/sponsors/*
 ├── uploads/
-│   └── partner-events/   ← banners enviados pelo admin
+│   ├── partner-events/    ← banners enviados pelo admin
+│   ├── accountability/    ← prints de prestação de contas
+│   ├── gallery/           ← fotos da galeria
+│   └── sponsors/          ← logos de patrocinadores
 ├── .env                  ← variáveis locais (não commitado)
 ├── .env.example          ← template das variáveis
 └── package.json
@@ -99,3 +107,7 @@ npm run dev
 - `/api/events` permanece apenas como alias legado de compatibilidade
 - Eventos parceiros têm CRUD separado e não entram no fluxo de inscrição/pagamento
 - A rota pública `/atolado-do-mes` é frontend-only e usa assets estáticos em `public/media/atolado-do-mes`
+- Galeria e Patrocinadores seguem o mesmo padrão: multer → `/uploads/` → Prisma → CRUD protegido por JWT
+- URLs de upload são resolvidas pelo helper `resolveApiAssetUrl()` no frontend, que prefixa `/api` para passar pelo proxy nginx
+- Os diretórios de upload são criados automaticamente na inicialização do servidor (`ensure*UploadsReady()`)
+- Novos models que sigam esse padrão precisam de: (1) model Prisma, (2) lib multer, (3) rota CRUD, (4) registro no `index.js` com `app.use()` + `ensure*UploadsReady()`

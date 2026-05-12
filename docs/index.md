@@ -37,6 +37,8 @@ Este diretório centraliza as especificações funcionais e técnicas do projeto
 - Eventos próprios: `/api/own-events`
 - Eventos parceiros: `/api/partner-events`
 - Calendário público unificado: `/api/calendar-events`
-- Rotas públicas do frontend: `/`, `/eventos`, `/atolado-do-mes`
+- Galeria de fotos: `/api/gallery`
+- Patrocinadores: `/api/sponsors`
+- Rotas públicas do frontend: `/`, `/eventos`, `/atolado-do-mes`, `/prestacao-de-contas`
 - Enum canônico de eventos próprios: `classification`
 - Alias legado mantido: `/api/events`

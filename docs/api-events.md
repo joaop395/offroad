@@ -4,7 +4,50 @@ Base URL: `http://localhost:3001`
 
 > Observação: a página pública `/atolado-do-mes` não consome API própria nesta fase; ela é uma experiência frontend com assets estáticos.
 
-## Rotas públicas
+## Rotas públicas — Galeria & Patrocinadores
+
+### GET /api/gallery
+
+Lista imagens da galeria ordenadas por `order`.
+
+**Resposta 200:**
+```json
+[
+  {
+    "id": 1,
+    "filename": "gallery-1712345678-abc123.jpg",
+    "label": "Roteiros que ninguém conhece",
+    "order": 0,
+    "uploadedAt": "2026-05-11T12:00:00.000Z"
+  }
+]
+```
+
+**URL da imagem:** `resolveApiAssetUrl('/uploads/gallery/' + filename)` → `/api/uploads/gallery/...`
+
+### GET /api/sponsors
+
+Lista patrocinadores ordenados por `order`.
+
+**Resposta 200:**
+```json
+[
+  {
+    "id": 1,
+    "filename": "sponsor-1712345678-abc123.png",
+    "name": "Borracharia do Zé",
+    "url": "https://instagram.com/...",
+    "order": 0,
+    "uploadedAt": "2026-05-11T12:00:00.000Z"
+  }
+]
+```
+
+**URL da imagem:** `resolveApiAssetUrl('/uploads/sponsors/' + filename)` → `/api/uploads/sponsors/...`
+
+---
+
+## Rotas públicas — Eventos
 
 ### GET /api/calendar-events
 
@@ -84,7 +127,62 @@ Vagas disponíveis em tempo real.
 
 ---
 
-## Rotas admin (requerem `Authorization: Bearer <token>`)
+## Rotas admin — Galeria (requerem `Authorization: Bearer <token>`)
+
+### POST /api/gallery
+
+Aceita `multipart/form-data`.
+
+**Campos:**
+- `image` (obrigatório, imagem, max 5MB)
+- `label` (obrigatório, texto)
+- `order` (opcional, número)
+
+**Resposta 201:** objeto `GalleryImage`
+
+### PUT /api/gallery/:id
+
+Aceita `multipart/form-data`. Para atualizar só label/order sem trocar imagem, não envie o campo `image`.
+
+**Resposta 200:** objeto `GalleryImage` atualizado
+
+### DELETE /api/gallery/:id
+
+**Resposta 200:** `{ "ok": true }`
+
+Remove o registro e o arquivo do disco.
+
+---
+
+## Rotas admin — Patrocinadores (requerem `Authorization: Bearer <token>`)
+
+### POST /api/sponsors
+
+Aceita `multipart/form-data`.
+
+**Campos:**
+- `image` (obrigatório, imagem, max 5MB)
+- `name` (obrigatório, texto)
+- `url` (opcional, link)
+- `order` (opcional, número)
+
+**Resposta 201:** objeto `Sponsor`
+
+### PUT /api/sponsors/:id
+
+Aceita `multipart/form-data`. Para atualizar só name/url/order sem trocar imagem, não envie o campo `image`.
+
+**Resposta 200:** objeto `Sponsor` atualizado
+
+### DELETE /api/sponsors/:id
+
+**Resposta 200:** `{ "ok": true }`
+
+Remove o registro e o arquivo do disco.
+
+---
+
+## Rotas admin — Eventos (requerem `Authorization: Bearer <token>`)
 
 ### POST /api/own-events
 
