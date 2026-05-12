@@ -44,7 +44,7 @@ export default function Sponsors() {
             <img
               src={resolveApiAssetUrl(`/uploads/sponsors/${s.filename}`)}
               alt={s.name}
-              className="h-12 md:h-16 w-auto max-w-[160px] object-contain opacity-40 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-110 transition-all duration-300"
+              className="h-16 md:h-24 w-auto max-w-[220px] object-contain opacity-40 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-110 transition-all duration-300"
             />
           )
           return (
