@@ -3,8 +3,18 @@ import { API_BASE } from '../lib/api'
 
 const AuthContext = createContext(null)
 
+function parseUser() {
+  try {
+    const raw = sessionStorage.getItem('admin_user')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => sessionStorage.getItem('admin_token'))
+  const [user, setUser] = useState(parseUser)
 
   const login = useCallback(async (email, password) => {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -16,7 +26,9 @@ export function AuthProvider({ children }) {
     const data = await res.json()
     if (!res.ok) throw new Error(data.error ?? 'Erro ao fazer login.')
     sessionStorage.setItem('admin_token', data.accessToken)
+    sessionStorage.setItem('admin_user', JSON.stringify(data.user))
     setToken(data.accessToken)
+    setUser(data.user)
     return data.accessToken
   }, [])
 
@@ -29,7 +41,9 @@ export function AuthProvider({ children }) {
       })
     } catch {}
     sessionStorage.removeItem('admin_token')
+    sessionStorage.removeItem('admin_user')
     setToken(null)
+    setUser(null)
   }, [token])
 
   const refresh = useCallback(async () => {
@@ -39,17 +53,21 @@ export function AuthProvider({ children }) {
     })
     if (!res.ok) {
       sessionStorage.removeItem('admin_token')
+      sessionStorage.removeItem('admin_user')
       setToken(null)
+      setUser(null)
       throw new Error('Sessão expirada.')
     }
     const data = await res.json()
     sessionStorage.setItem('admin_token', data.accessToken)
+    sessionStorage.setItem('admin_user', JSON.stringify(data.user))
     setToken(data.accessToken)
+    setUser(data.user)
     return data.accessToken
   }, [])
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, refresh, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ token, user, login, logout, refresh, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   )

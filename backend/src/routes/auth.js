@@ -22,14 +22,15 @@ const loginSchema = z.object({
   password: z.string().min(1),
 })
 
-function generateTokens(adminId) {
+function generateTokens(admin) {
+  const payload = { sub: admin.id, email: admin.email, role: admin.role }
   const accessToken = jwt.sign(
-    { sub: adminId },
+    payload,
     process.env.JWT_SECRET,
     { expiresIn: '15m' }
   )
   const refreshToken = jwt.sign(
-    { sub: adminId },
+    payload,
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   )
@@ -64,10 +65,10 @@ router.post('/login', loginLimiter, async (req, res) => {
     return res.status(401).json({ error: 'Credenciais inválidas.' })
   }
 
-  const { accessToken, refreshToken } = generateTokens(admin.id)
+  const { accessToken, refreshToken } = generateTokens(admin)
   setRefreshCookie(res, refreshToken)
 
-  res.json({ accessToken })
+  res.json({ accessToken, user: { email: admin.email, role: admin.role } })
 })
 
 // POST /api/auth/refresh
@@ -77,12 +78,25 @@ router.post('/refresh', async (req, res) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
-    const { accessToken, refreshToken } = generateTokens(payload.sub)
+    const admin = await prisma.admin.findUnique({ where: { id: payload.sub } })
+    if (!admin) return res.status(401).json({ error: 'Sessão expirada. Faça login novamente.' })
+
+    const { accessToken, refreshToken } = generateTokens(admin)
     setRefreshCookie(res, refreshToken)
-    res.json({ accessToken })
+    res.json({ accessToken, user: { email: admin.email, role: admin.role } })
   } catch {
     return res.status(401).json({ error: 'Sessão expirada. Faça login novamente.' })
   }
+})
+
+// GET /api/auth/me
+router.get('/me', requireAuth, async (req, res) => {
+  const admin = await prisma.admin.findUnique({
+    where: { id: req.admin.sub },
+    select: { id: true, email: true, role: true },
+  })
+  if (!admin) return res.status(404).json({ error: 'Usuário não encontrado.' })
+  res.json({ user: admin })
 })
 
 // POST /api/auth/logout

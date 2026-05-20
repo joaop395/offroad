@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import LoginDropdown from './LoginDropdown'
 
 const InstaIcon = () => (
   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -10,7 +12,9 @@ const InstaIcon = () => (
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
   const location = useLocation()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -120,6 +124,27 @@ export default function Nav() {
             </a>
           </li>
         </ul>
+      </div>
+
+      {/* User login icon */}
+      <div className="relative flex-shrink-0 ml-2 sm:ml-4">
+        <button
+          onClick={() => setLoginOpen(v => !v)}
+          className={`flex items-center justify-center w-9 h-9 rounded border transition-all duration-200 ${
+            isAuthenticated
+              ? 'border-gold/40 text-gold hover:bg-gold/10'
+              : 'border-white/15 text-white/50 hover:border-gold/30 hover:text-gold'
+          }`}
+          aria-label="Login"
+        >
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+          {isAuthenticated && (
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-gold rounded-full" />
+          )}
+        </button>
+        <LoginDropdown open={loginOpen} onClose={() => setLoginOpen(false)} />
       </div>
     </motion.nav>
   )
