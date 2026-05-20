@@ -24,6 +24,7 @@ export default function Nav() {
     { label: 'Galeria', to: '/#galeria', active: location.pathname === '/' && location.hash === '#galeria' },
     { label: 'Eventos', to: '/eventos', active: location.pathname === '/eventos' },
     { label: 'Atolado do Mês', to: '/atolado-do-mes', active: location.pathname === '/atolado-do-mes' },
+    { label: 'Dicas', to: '/dicas', active: location.pathname === '/dicas' },
     { label: 'Prestação de Contas', to: '/prestacao-de-contas', active: location.pathname === '/prestacao-de-contas' },
   ]
 

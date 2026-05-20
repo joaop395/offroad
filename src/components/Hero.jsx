@@ -19,7 +19,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-6 pb-24"
+      className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-6"
     >
       {/* Background video */}
       <video autoPlay loop muted playsInline className="absolute inset-0 h-full w-full scale-105 object-cover blur-[3px]">

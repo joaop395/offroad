@@ -14,10 +14,12 @@ import paymentsRoutes from './routes/payments.js'
 import settingsRoutes from './routes/settings.js'
 import galleryRoutes from './routes/gallery.js'
 import sponsorRoutes from './routes/sponsors.js'
+import tipsRoutes from './routes/tips.js'
 import { ensureAccountabilityUploadsReady } from './lib/accountabilityUploads.js'
 import { ensureUploadsReady } from './lib/partnerEventUploads.js'
 import { ensureGalleryUploadsReady } from './lib/galleryUploads.js'
 import { ensureSponsorUploadsReady } from './lib/sponsorUploads.js'
+import { ensureTipUploadsReady } from './lib/tipUploads.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -114,6 +116,7 @@ app.use('/api/payments', paymentsRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/gallery', galleryRoutes)
 app.use('/api/sponsors', sponsorRoutes)
+app.use('/api/tips', tipsRoutes)
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
@@ -128,6 +131,7 @@ Promise.all([
   ensureAccountabilityUploadsReady(),
   ensureGalleryUploadsReady(),
   ensureSponsorUploadsReady(),
+  ensureTipUploadsReady(),
 ])
   .then(() => {
     app.listen(PORT, () => {

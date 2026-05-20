@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useApi } from '../../hooks/useApi'
-import { API_PATHS } from '../../lib/api'
+import { API_PATHS, resolveApiAssetUrl } from '../../lib/api'
 import EventForm from './EventForm'
 import PartnerEventForm from './PartnerEventForm'
 import RegistrationsList from './RegistrationsList'
 import AdminSettings from './AdminSettings'
 import GalleryUpload from './GalleryUpload'
 import SponsorUpload from './SponsorUpload'
+import TipsForm from './TipsForm'
 
 const CLASSIFICATION_LABELS = {
   LEVE_4X4:    { label: 'Leve 4x4',          color: '#27AE60' },
@@ -44,6 +45,10 @@ export default function AdminDashboard() {
   const [galleryLoading, setGalleryLoading] = useState(true)
   const [sponsors, setSponsors] = useState([])
   const [sponsorsLoading, setSponsorsLoading] = useState(true)
+  const [tips, setTips] = useState([])
+  const [tipsLoading, setTipsLoading] = useState(true)
+  const [tipFormOpen, setTipFormOpen] = useState(false)
+  const [editingTip, setEditingTip] = useState(null)
 
   const fetchEvents = useCallback(async () => {
     setLoading(true)
@@ -89,10 +94,22 @@ export default function AdminDashboard() {
     }
   }, [apiFetch])
 
+  const fetchTips = useCallback(async () => {
+    setTipsLoading(true)
+    try {
+      const res = await apiFetch(`${API_PATHS.tips}/all`)
+      const data = await res.json()
+      setTips(data)
+    } finally {
+      setTipsLoading(false)
+    }
+  }, [apiFetch])
+
   useEffect(() => { fetchEvents() }, [fetchEvents])
   useEffect(() => { fetchPartnerEvents() }, [fetchPartnerEvents])
   useEffect(() => { fetchGallery() }, [fetchGallery])
   useEffect(() => { fetchSponsors() }, [fetchSponsors])
+  useEffect(() => { fetchTips() }, [fetchTips])
 
   async function handleDelete(id) {
     if (!confirm('Tem certeza que deseja excluir este evento? As inscrições também serão removidas.')) return
@@ -109,6 +126,12 @@ export default function AdminDashboard() {
     if (!confirm('Tem certeza que deseja excluir este evento parceiro?')) return
     await apiFetch(`${API_PATHS.partnerEvents}/${id}`, { method: 'DELETE' })
     fetchPartnerEvents()
+  }
+
+  async function handleDeleteTip(id) {
+    if (!confirm('Tem certeza que deseja excluir esta dica?')) return
+    await apiFetch(`${API_PATHS.tips}/${id}`, { method: 'DELETE' })
+    fetchTips()
   }
 
   return (
@@ -131,7 +154,7 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <nav className="relative z-10 border-b border-white/10 px-6 flex gap-6 overflow-x-auto">
-        {[['own-events', 'Eventos próprios'], ['partner-events', 'Eventos parceiros'], ['gallery', 'Galeria'], ['sponsors', 'Patrocinadores'], ['settings', 'Configurações']].map(([key, label]) => (
+        {[['own-events', 'Eventos próprios'], ['partner-events', 'Eventos parceiros'], ['gallery', 'Galeria'], ['sponsors', 'Patrocinadores'], ['tips', 'Dicas'], ['settings', 'Configurações']].map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -147,6 +170,128 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="relative z-10 max-w-5xl mx-auto px-6 py-8">
+        {tab === 'tips' && (
+          <>
+            {tipFormOpen && (
+              <TipsForm
+                initial={editingTip}
+                apiFetch={apiFetch}
+                onSave={() => { setTipFormOpen(false); setEditingTip(null); fetchTips() }}
+                onCancel={() => { setTipFormOpen(false); setEditingTip(null) }}
+              />
+            )}
+
+            {!tipFormOpen && (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="font-display text-gold tracking-widest text-2xl">Dicas</h2>
+                  <button
+                    onClick={() => { setEditingTip(null); setTipFormOpen(true) }}
+                    className="bg-gold text-offblack font-display tracking-[0.16em] uppercase text-sm px-5 py-2.5 hover:bg-gold-dark transition-colors"
+                  >
+                    + Nova Dica
+                  </button>
+                </div>
+
+                {tipsLoading && <p className="font-mono text-white/40 text-sm">Carregando...</p>}
+
+                {!tipsLoading && tips.length === 0 && (
+                  <p className="font-mono text-white/40 text-sm">Nenhuma dica cadastrada.</p>
+                )}
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+                  {tips.map((tip, idx) => (
+                    <div
+                      key={tip.id}
+                      className="border border-white/10 bg-card overflow-hidden group relative"
+                    >
+                      <div className="aspect-video bg-offblack relative">
+                        {tip.imageUrl ? (
+                          <img src={resolveApiAssetUrl(tip.imageUrl)} alt={tip.title} className="absolute inset-0 w-full h-full object-cover" />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                            <svg className="h-10 w-10" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                          </div>
+                        )}
+                        {!tip.published && (
+                          <span className="absolute top-2 left-2 bg-red-900/80 text-red-300 font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5">Rascunho</span>
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <h3 className="font-display text-[15px] tracking-[0.06em] text-gold line-clamp-2">{tip.title}</h3>
+                        {tip.description && (
+                          <p className="font-mono text-[10px] text-white/40 mt-1 line-clamp-2">{tip.description}</p>
+                        )}
+                        <p className="font-mono text-[9px] text-white/20 mt-1 truncate">{tip.youtubeUrl}</p>
+                      </div>
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {idx > 0 && (
+                          <button
+                            onClick={async () => {
+                              const prev = tips[idx - 1]
+                              await Promise.all([
+                                apiFetch(`${API_PATHS.tips}/${tip.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ title: tip.title, youtubeUrl: tip.youtubeUrl, description: tip.description, published: tip.published, order: prev.order, removeImage: 'false' }),
+                                }),
+                                apiFetch(`${API_PATHS.tips}/${prev.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ title: prev.title, youtubeUrl: prev.youtubeUrl, description: prev.description, published: prev.published, order: tip.order, removeImage: 'false' }),
+                                }),
+                              ])
+                              fetchTips()
+                            }}
+                            className="bg-offblack/80 text-gold px-2 py-1 text-xs font-mono hover:bg-offblack"
+                            title="Subir"
+                          >↑</button>
+                        )}
+                        {idx < tips.length - 1 && (
+                          <button
+                            onClick={async () => {
+                              const next = tips[idx + 1]
+                              await Promise.all([
+                                apiFetch(`${API_PATHS.tips}/${tip.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ title: tip.title, youtubeUrl: tip.youtubeUrl, description: tip.description, published: tip.published, order: next.order, removeImage: 'false' }),
+                                }),
+                                apiFetch(`${API_PATHS.tips}/${next.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ title: next.title, youtubeUrl: next.youtubeUrl, description: next.description, published: next.published, order: tip.order, removeImage: 'false' }),
+                                }),
+                              ])
+                              fetchTips()
+                            }}
+                            className="bg-offblack/80 text-gold px-2 py-1 text-xs font-mono hover:bg-offblack"
+                            title="Descer"
+                          >↓</button>
+                        )}
+                        <button
+                          onClick={() => { setEditingTip(tip); setTipFormOpen(true) }}
+                          className="bg-offblack/80 text-gold px-2 py-1 text-xs font-mono hover:bg-offblack"
+                          title="Editar"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTip(tip.id)}
+                          className="bg-red-900/60 text-red-300 px-2 py-1 text-xs font-mono hover:bg-red-900"
+                          title="Excluir"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
+
         {tab === 'settings' && <AdminSettings apiFetch={apiFetch} />}
 
         {tab === 'gallery' && (

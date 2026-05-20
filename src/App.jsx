@@ -8,6 +8,7 @@ import AtoladoPage from './pages/AtoladoPage'
 import EventsPage from './pages/EventsPage'
 import HomePage from './pages/HomePage'
 import SuccessPage   from './pages/SuccessPage'
+import TipsPage from './pages/TipsPage'
 import TransparencyPage from './pages/TransparencyPage'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/eventos" element={<EventsPage />} />
           <Route path="/atolado-do-mes" element={<AtoladoPage />} />
           <Route path="/prestacao-de-contas" element={<TransparencyPage />} />
+          <Route path="/dicas" element={<TipsPage />} />
         </Route>
         <Route path="/inscricao/sucesso" element={<SuccessPage />} />
         <Route path="/inscricao/erro" element={<SuccessPage />} />

@@ -50,6 +50,7 @@ export const API_PATHS = {
   calendarEvents: '/api/calendar-events',
   gallery: '/api/gallery',
   sponsors: '/api/sponsors',
+  tips: '/api/tips',
 }
 
 export function resolveApiAssetUrl(path) {
