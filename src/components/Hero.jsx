@@ -49,7 +49,7 @@ export default function Hero() {
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="relative z-10 flex flex-col items-center"
+        className="relative z-10 flex flex-col items-center pt-20 md:pt-24"
       >
         {/* Logo — círculo branco para contrastar com o PNG */}
         <motion.div
