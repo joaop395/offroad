@@ -15,11 +15,23 @@ import settingsRoutes from './routes/settings.js'
 import galleryRoutes from './routes/gallery.js'
 import sponsorRoutes from './routes/sponsors.js'
 import tipsRoutes from './routes/tips.js'
+import vehicleRegistrationsRoutes from './routes/vehicle-registrations.js'
 import { ensureAccountabilityUploadsReady } from './lib/accountabilityUploads.js'
 import { ensureUploadsReady } from './lib/partnerEventUploads.js'
 import { ensureGalleryUploadsReady } from './lib/galleryUploads.js'
 import { ensureSponsorUploadsReady } from './lib/sponsorUploads.js'
 import { ensureTipUploadsReady } from './lib/tipUploads.js'
+import fs from 'fs/promises'
+import path2 from 'path'
+import { fileURLToPath as fileURLToPath2 } from 'url'
+
+const __filename2 = fileURLToPath2(import.meta.url)
+const __dirname2 = path2.dirname(__filename2)
+const logoDir = path2.join(__dirname2, '..', 'uploads', 'event-logos')
+
+async function ensureLogoUploadsReady() {
+  await fs.mkdir(logoDir, { recursive: true })
+}
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -117,6 +129,7 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/gallery', galleryRoutes)
 app.use('/api/sponsors', sponsorRoutes)
 app.use('/api/tips', tipsRoutes)
+app.use('/api/vehicle-registrations', vehicleRegistrationsRoutes)
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
@@ -132,6 +145,7 @@ Promise.all([
   ensureGalleryUploadsReady(),
   ensureSponsorUploadsReady(),
   ensureTipUploadsReady(),
+  ensureLogoUploadsReady(),
 ])
   .then(() => {
     app.listen(PORT, () => {

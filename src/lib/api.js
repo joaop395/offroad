@@ -48,6 +48,7 @@ export const API_PATHS = {
   legacyEvents: '/api/events',
   partnerEvents: '/api/partner-events',
   calendarEvents: '/api/calendar-events',
+  vehicleRegistrations: '/api/vehicle-registrations',
   gallery: '/api/gallery',
   sponsors: '/api/sponsors',
   tips: '/api/tips',

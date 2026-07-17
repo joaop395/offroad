@@ -20,6 +20,10 @@ function InfoRow({ label, value }) {
   )
 }
 
+function isBeneficenteEvent(event) {
+  return isOwnEvent(event) && event?.isBeneficente === true
+}
+
 function parseDescription(value) {
   return value
     .replace(/\r\n/g, '\n')
@@ -90,8 +94,10 @@ function DescriptionBlock({ lines }) {
 
 export default function EventDetailPanel({ event, onBook, compact = false, teaser = false }) {
   const own = isOwnEvent(event)
+  const beneficente = isBeneficenteEvent(event)
   const classification = getClassificationMeta(event)
   const bannerSrc = resolveApiAssetUrl(event?.bannerUrl)
+  const logoSrc = resolveApiAssetUrl(event?.logoUrl)
   const partnerTeaser = teaser && !own
   const shellBackground = teaser ? 'bg-[#040403]/97' : 'bg-[#0c0b09]/82'
   const asideBackground = teaser ? 'bg-[#12100c]/82' : 'bg-white/[0.03]'
@@ -148,12 +154,12 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
           <div>
             <div className="flex flex-wrap items-center gap-3">
               <span className={`font-mono text-[10px] uppercase tracking-[0.3em] px-3 py-1 ${
-                own ? 'bg-gold text-offblack' : 'bg-white/10 text-white/78'
+                beneficente ? 'bg-green-600 text-white' : own ? 'bg-gold text-offblack' : 'bg-white/10 text-white/78'
               }`}>
-                {own ? 'Offroad Sem Juizo' : 'Evento parceiro'}
+                {beneficente ? 'Beneficente' : own ? 'Offroad Sem Juizo' : 'Evento parceiro'}
               </span>
 
-              {classification && (
+              {!beneficente && classification && (
                 <span
                   className="font-mono text-[10px] uppercase tracking-[0.22em] px-3 py-1 text-white"
                   style={{ backgroundColor: classification.color }}
@@ -192,7 +198,7 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
               </div>
             )}
 
-            {own && (
+            {own && !beneficente && (
               <div className={`${compact ? 'mt-5 flex flex-wrap items-center gap-3' : 'mt-7 flex flex-wrap items-center gap-4'}`}>
                 {!hasAvailabilityInfo || event.availableSlots > 0 ? (
                   <button
@@ -214,10 +220,34 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
                 )}
               </div>
             )}
+
+            {own && beneficente && (
+              <div className={`${compact ? 'mt-5 flex flex-wrap items-center gap-3' : 'mt-7 flex flex-wrap items-center gap-4'}`}>
+                <a
+                  href={`/evento-beneficente/${event.id}`}
+                  className={`bg-green-600 font-display tracking-[0.16em] text-white transition-colors duration-200 hover:bg-green-700 ${compact ? 'px-5 py-2.5 text-[16px]' : 'px-6 py-3 text-[18px]'}`}
+                >
+                  Cadastrar Veiculo
+                </a>
+              </div>
+            )}
           </div>
 
           <div className={`border border-white/10 ${asideBackground} ${compact ? 'p-4' : 'p-5'}`}>
-            {bannerSrc && !imageFailed && (
+            {/* Logo para eventos beneficentes */}
+            {beneficente && logoSrc && !imageFailed && (
+              <div className="mb-5 border border-white/8 bg-offblack/40 overflow-hidden">
+                <img
+                  src={logoSrc}
+                  alt={event.name}
+                  className={`w-full object-contain ${compact ? 'max-h-40' : 'max-h-48'}`}
+                  onError={() => setImageFailed(true)}
+                />
+              </div>
+            )}
+
+            {/* Banner para eventos normais */}
+            {!beneficente && bannerSrc && !imageFailed && (
               <button
                 type="button"
                 onClick={() => setBannerExpanded(true)}
@@ -240,7 +270,7 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
               </button>
             )}
 
-            {(imageFailed || (!bannerSrc && !own && !partnerTeaser)) && (
+            {(imageFailed || (!bannerSrc && !logoSrc && !own && !partnerTeaser)) && (
               <div className="mb-5 border border-dashed border-white/10 bg-[radial-gradient(circle_at_top,_rgba(212,184,39,0.18),_transparent_58%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] px-5 py-8">
                 <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-white/35">
                   Material visual
@@ -255,7 +285,7 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
 
             <InfoRow label="Local" value={event.location} />
 
-            {own && (
+            {own && !beneficente && (
               <>
                 <InfoRow label="Adulto" value={formatCurrency(event.priceAdult)} />
                 <InfoRow label="Crianca" value={formatCurrency(event.priceChild)} />
@@ -266,6 +296,10 @@ export default function EventDetailPanel({ event, onBook, compact = false, tease
                   />
                 )}
               </>
+            )}
+
+            {own && beneficente && (
+              <InfoRow label="Tipo" value="Gratuito · Cadastro de veiculos" />
             )}
           </div>
         </div>

@@ -51,6 +51,9 @@ export function getClassificationMeta(event) {
 
 export function getEventBadge(event) {
   if (isOwnEvent(event)) {
+    if (event.isBeneficente) {
+      return { label: 'Beneficente', tone: 'green' }
+    }
     return { label: 'Offroad Sem Juízo', tone: 'gold' }
   }
 

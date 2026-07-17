@@ -20,14 +20,29 @@ model Event {
   name          String
   date          DateTime
   location      String
-  classification Classification
-  priceAdult    Float
-  priceChild    Float
-  maxSlots      Int
+  description   String?
+  classification Classification @default(REUNIAO)
+  priceAdult    Float          @default(0)
+  priceChild    Float          @default(0)
+  maxSlots      Int            @default(0)
+  isBeneficente Boolean        @default(false)
+  logoUrl       String?
   accountabilityImageUrl String?
   registrations Registration[]
+  vehicleRegistrations VehicleRegistration[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+}
+
+model VehicleRegistration {
+  id              Int      @id @default(autoincrement())
+  eventId         Int
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  driverName      String
+  cpf             String
+  plate           String
+  availableSlots  Int
+  createdAt       DateTime @default(now())
 }
 
 model PartnerEvent {

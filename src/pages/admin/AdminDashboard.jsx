@@ -6,6 +6,7 @@ import { API_PATHS, resolveApiAssetUrl } from '../../lib/api'
 import EventForm from './EventForm'
 import PartnerEventForm from './PartnerEventForm'
 import RegistrationsList from './RegistrationsList'
+import VehiclesList from './VehiclesList'
 import AdminSettings from './AdminSettings'
 import GalleryUpload from './GalleryUpload'
 import SponsorUpload from './SponsorUpload'
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing]   = useState(null)
   const [viewingId, setViewingId] = useState(null)
+  const [viewingVehiclesId, setViewingVehiclesId] = useState(null)
   const [partnerEvents, setPartnerEvents] = useState([])
   const [partnerLoading, setPartnerLoading] = useState(true)
   const [partnerFormOpen, setPartnerFormOpen] = useState(false)
@@ -312,8 +314,18 @@ export default function AdminDashboard() {
 
         {tab === 'own-events' && (
           <>
+            {/* Tela de veículos (beneficente) */}
+            {viewingVehiclesId && (
+              <VehiclesList
+                eventId={viewingVehiclesId}
+                eventName={events.find(e => e.id === viewingVehiclesId)?.name ?? ''}
+                apiFetch={apiFetch}
+                onBack={() => setViewingVehiclesId(null)}
+              />
+            )}
+
             {/* Tela de inscritos */}
-            {viewingId && (
+            {!viewingVehiclesId && viewingId && (
               <RegistrationsList
                 eventId={viewingId}
                 eventName={events.find(e => e.id === viewingId)?.name ?? ''}
@@ -323,7 +335,7 @@ export default function AdminDashboard() {
             )}
 
             {/* Formulário */}
-            {!viewingId && formOpen && (
+            {!viewingVehiclesId && !viewingId && formOpen && (
               <EventForm
                 initial={editing}
                 apiFetch={apiFetch}
@@ -333,7 +345,7 @@ export default function AdminDashboard() {
             )}
 
             {/* Lista de eventos */}
-            {!viewingId && !formOpen && (
+            {!viewingVehiclesId && !viewingId && !formOpen && (
               <>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="font-display text-gold tracking-widest text-2xl">Eventos</h2>
@@ -357,6 +369,7 @@ export default function AdminDashboard() {
                   {events.map(ev => {
                     const classification = CLASSIFICATION_LABELS[ev.classification] ?? CLASSIFICATION_LABELS.LEVE_4X4
                     const available = ev.maxSlots - ev.slotsUsed
+                    const isBenef = ev.isBeneficente
                     return (
                       <div
                         key={ev.id}
@@ -366,12 +379,18 @@ export default function AdminDashboard() {
 
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1">
-                            <span
-                              className="font-mono text-[10px] tracking-[0.2em] uppercase px-2 py-0.5"
-                              style={{ backgroundColor: classification.color, color: '#fff' }}
-                            >
-                              {classification.label}
-                            </span>
+                            {isBenef ? (
+                              <span className="font-mono text-[10px] tracking-[0.2em] uppercase px-2 py-0.5 bg-green-600 text-white">
+                                Beneficente
+                              </span>
+                            ) : (
+                              <span
+                                className="font-mono text-[10px] tracking-[0.2em] uppercase px-2 py-0.5"
+                                style={{ backgroundColor: classification.color, color: '#fff' }}
+                              >
+                                {classification.label}
+                              </span>
+                            )}
                             {ev.accountabilityImageUrl && (
                               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gold/68">
                                 Com prestação
@@ -382,18 +401,33 @@ export default function AdminDashboard() {
                           <p className="font-mono text-white/50 text-xs mt-1">
                             {formatDate(ev.date)} · {ev.location}
                           </p>
-                          <p className="font-mono text-white/40 text-xs mt-1">
-                            Adulto: R$ {ev.priceAdult.toFixed(2)} · Criança: R$ {ev.priceChild.toFixed(2)} · Vagas: {available}/{ev.maxSlots}
-                          </p>
+                          {isBenef ? (
+                            <p className="font-mono text-white/40 text-xs mt-1">
+                              Gratuito · Link: /evento-beneficente/{ev.id}
+                            </p>
+                          ) : (
+                            <p className="font-mono text-white/40 text-xs mt-1">
+                              Adulto: R$ {ev.priceAdult.toFixed(2)} · Criança: R$ {ev.priceChild.toFixed(2)} · Vagas: {available}/{ev.maxSlots}
+                            </p>
+                          )}
                         </div>
 
                         <div className="flex gap-2 flex-shrink-0">
-                          <button
-                            onClick={() => setViewingId(ev.id)}
-                            className="font-mono text-[11px] tracking-widest uppercase px-4 py-2 border border-white/20 text-white/60 hover:border-gold/50 hover:text-gold transition-colors"
-                          >
-                            Inscritos ({ev.slotsUsed})
-                          </button>
+                          {isBenef ? (
+                            <button
+                              onClick={() => setViewingVehiclesId(ev.id)}
+                              className="font-mono text-[11px] tracking-widest uppercase px-4 py-2 border border-green-500/40 text-green-400 hover:bg-green-900/20 transition-colors"
+                            >
+                              Veículos
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setViewingId(ev.id)}
+                              className="font-mono text-[11px] tracking-widest uppercase px-4 py-2 border border-white/20 text-white/60 hover:border-gold/50 hover:text-gold transition-colors"
+                            >
+                              Inscritos ({ev.slotsUsed})
+                            </button>
+                          )}
                           <button
                             onClick={() => { setEditing(ev); setFormOpen(true) }}
                             className="font-mono text-[11px] tracking-widest uppercase px-4 py-2 border border-gold/40 text-gold hover:bg-gold/10 transition-colors"

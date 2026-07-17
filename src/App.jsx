@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage'
 import SuccessPage   from './pages/SuccessPage'
 import TipsPage from './pages/TipsPage'
 import TransparencyPage from './pages/TransparencyPage'
+import VehicleRegistrationPage from './pages/VehicleRegistrationPage'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/atolado-do-mes" element={<AtoladoPage />} />
           <Route path="/prestacao-de-contas" element={<TransparencyPage />} />
           <Route path="/dicas" element={<TipsPage />} />
+          <Route path="/evento-beneficente/:id" element={<VehicleRegistrationPage />} />
         </Route>
         <Route path="/inscricao/sucesso" element={<SuccessPage />} />
         <Route path="/inscricao/erro" element={<SuccessPage />} />

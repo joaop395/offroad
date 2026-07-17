@@ -160,9 +160,11 @@ export default function EventsPage() {
                             setSelected(event)
                           }}
                           className={`cursor-pointer border px-1.5 py-1 md:px-2 md:py-1.5 ${
-                            isOwnEvent(event)
-                              ? 'border-gold/28 bg-gold/10'
-                              : 'border-white/10 bg-white/[0.03]'
+                            event.isBeneficente
+                              ? 'border-green-500/28 bg-green-500/10'
+                              : isOwnEvent(event)
+                                ? 'border-gold/28 bg-gold/10'
+                                : 'border-white/10 bg-white/[0.03]'
                           }`}
                         >
                           <p className="truncate font-mono text-[8px] uppercase tracking-[0.12em] text-white/76 md:text-[9px] md:tracking-[0.16em]">
