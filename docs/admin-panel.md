@@ -14,6 +14,7 @@
 /inscricao/sucesso      → retorno de pagamento aprovado
 /inscricao/pendente     → retorno de pagamento pendente
 /inscricao/erro         → retorno de pagamento não aprovado
+/evento-beneficente/:id → página pública de cadastro de veículo
 ```
 
 Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona automaticamente para `/offroad-admin`.
@@ -28,12 +29,41 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 
 ### Eventos próprios
 
-- Lista todos os eventos com classificação, data, local, preços e vagas
-- **Novo Evento**: abre formulário com campos:
-  - Nome, Data/hora, Local, Classificação (select com presets), Vagas máximas obrigatórias, Valor adulto, Valor criança
-- **Editar**: reabre o formulário preenchido
-- **Excluir**: confirma antes — remove evento e todas as inscrições (CASCADE)
-- **Inscritos (N)**: abre lista de inscrições do evento
+- Lista todos os eventos com classificação/badge, data, local, preços e vagas
+- Eventos beneficentes mostram badge verde "Beneficente" e link de cadastro
+- **Novo Evento**: abre formulário com toggle "Evento Beneficente" no topo
+
+#### Formulário — Evento normal
+
+- Nome, Data/hora, Local, Classificação (select com presets), Vagas máximas, Valor adulto, Valor criança
+- Print da prestação de contas (upload imagem, opcional)
+- Descrição (opcional)
+
+#### Formulário — Evento beneficente
+
+Quando o toggle "Evento Beneficente" está ativado:
+- Nome, Data/hora, Local (obrigatórios)
+- Descrição (obrigatório)
+- Logo do evento (upload imagem, opcional)
+- Classificação, preços e vagas são ocultados (definidos automaticamente como REUNIAO/0/0)
+- Print da prestação de contas é ocultado
+
+Após salvar evento beneficente, um painel verde exibe o link de inscrição:
+```
+Link de inscrição: https://site.com/evento-beneficente/123
+[Botão Copiar Link]
+```
+
+- **Editar**: reabre o formulário preenchido (mantém o toggle correto)
+- **Excluir**: confirma antes — remove evento, inscrições e veículos (CASCADE)
+- **Veículos**: (beneficente) abre lista de veículos cadastrados
+- **Inscritos (N)**: (normal) abre lista de inscrições do evento
+
+### Veículos cadastrados (beneficente)
+
+- Lista veículos com: nome do motorista, CPF, placa, vagas disponíveis
+- **Exportar CSV**: gera arquivo com todos os veículos
+- **Remove**: exclusão individual com confirmação
 
 ### Eventos parceiros
 
@@ -63,6 +93,20 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - **Reordenar**: botões ↑↓ trocam a posição
 - **Excluir**: remove do banco e deleta o arquivo
 
+### Dicas
+
+- Lista os vídeos em grid com thumbnails (YouTube) ou imagem de capa customizada
+- **Nova Dica**: abre formulário com campos:
+  - Título (obrigatório, max 120)
+  - Link do YouTube (obrigatório — aceita youtube.com/watch, youtu.be, shorts, embed)
+  - Descrição (opcional, max 2000)
+  - Imagem de capa (opcional, PNG/JPG, max 5MB)
+  - Checkbox "Publicado" — desmarcado = rascunho (não aparece publicamente)
+- **Editar**: reabre o formulário preenchido, com preview da imagem atual
+- **Reordenar**: botões ↑↓ trocam a posição (atualiza `order` via PATCH batch)
+- **Excluir**: remove do banco e deleta a imagem associada
+- Badge "Rascunho" aparece nos cards não publicados
+
 ### Configurações
 
 - Campo: **Número WhatsApp do admin** (formato: `5511999990000`)
@@ -85,6 +129,9 @@ Se tentar acessar `/offroad-admin/dashboard` sem estar logado, redireciona autom
 - Eventos parceiros usam `/api/partner-events`
 - O calendário público mistura os dois tipos via `/api/calendar-events`
 - Somente eventos próprios aceitam inscrições e pagamentos pelo site
+- Eventos beneficentes (`isBeneficente=true`) aceitam cadastro de veículos via link público
+- O link de cadastro é `/evento-beneficente/:eventId` — compartilhável via WhatsApp/redes
 - `Atolado do Mês` não é gerenciado pelo painel na versão atual; a página usa mídia pública estática
-- Galeria e Patrocinadores seguem o mesmo padrão de CRUD: multer + Prisma + `/uploads/` servido via `/api/uploads/`
+- Galeria, Patrocinadores e Dicas seguem o mesmo padrão de CRUD: multer + Prisma + `/uploads/` servido via `/api/uploads/`
+- Dicas não publicadas (`published: false`) são visíveis apenas no admin
 - A seção pública de cada recurso só renderiza se houver dados — se vazia ou backend off, some graciosamente

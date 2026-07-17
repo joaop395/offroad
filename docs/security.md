@@ -7,7 +7,7 @@
 | Senha hasheada com bcrypt | ✅ | rounds: 12 |
 | JWT de curta duração | ✅ | Access token: 15 min |
 | Refresh token httpOnly | ✅ | 7 dias, Secure + SameSite=Strict |
-| Rate limit no login | ✅ | 5 tentativas / 15 min por IP |
+| Rate limit no login | ❌ | Removido para conveniência do admin |
 | Mensagem de erro genérica | ✅ | Nunca revela se e-mail existe |
 | Timing-safe no login | ✅ | bcrypt roda mesmo para e-mails inexistentes |
 
@@ -32,6 +32,10 @@
 | Raw body no webhook | ✅ | Necessário para verificar assinatura MP |
 | Contrato canônico de eventos próprios | ✅ | `/api/own-events` é a rota oficial; `/api/events` é apenas alias legado |
 | Upload de banner validado | ✅ | Apenas imagem, limite de tamanho e persistência controlada |
+| Upload de imagem de dica validado | ✅ | Apenas imagem, limite de 5MB, URL YouTube normalizada |
+| Upload de logo de evento validado | ✅ | Apenas imagem, limite de 5MB, persistência controlada |
+| Cadastro de veículo validado | ✅ | CPF/Placa por regex, CPF único por evento, limite 50 vagas |
+| Rota de veículos valida tipo de evento | ✅ | Apenas eventos `isBeneficente=true` aceitam cadastro |
 
 ## Pagamentos
 
@@ -75,5 +79,5 @@
 - [ ] Configurar webhook no painel MP Developers com URL de produção
 - [ ] Garantir HTTPS no backend (necessário para cookie Secure)
 - [ ] Verificar que `backend/.env` e `prisma/dev.db` não estão no repositório
-- [ ] Garantir persistência/backup de `backend/uploads/partner-events` em produção
+- [ ] Garantir persistência/backup de `backend/uploads/partner-events` e `backend/uploads/tips` em produção
 - [ ] Confirmar que `public/media/atolado-do-mes` está presente no deploy de produção
