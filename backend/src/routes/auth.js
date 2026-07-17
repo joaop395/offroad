@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { rateLimit } from 'express-rate-limit'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
@@ -7,15 +6,6 @@ import prisma from '../lib/prisma.js'
 import { requireAuth } from '../middleware/auth.js'
 
 const router = Router()
-
-// Rate limit específico para login: 5 tentativas / 15 min por IP
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
-})
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -48,7 +38,7 @@ function setRefreshCookie(res, token) {
 }
 
 // POST /api/auth/login
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', async (req, res) => {
   const result = loginSchema.safeParse(req.body)
   if (!result.success) {
     return res.status(400).json({ error: 'Credenciais inválidas.' })
